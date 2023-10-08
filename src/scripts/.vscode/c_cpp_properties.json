@@ -1,0 +1,27 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/scout/catkin_ws/devel/include/**",
+        "/home/scout/catkin_ws_d455/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/scout/catkin_ws/src/gps_nav/include/**",
+        "/home/scout/catkin_ws_d455/src/realsense-ros/realsense2_camera/include/**",
+        "/home/scout/catkin_ws/src/scout_ros/scout_base/include/**",
+        "/home/scout/catkin_ws/src/ugv_sdk/include/**",
+        "/home/scout/catkin_ws/src/vslam/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

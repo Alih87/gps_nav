@@ -1,0 +1,11 @@
+<launch>
+
+<param name="robot_description" textfile="$(find gps_nav)/urdf/vehicle.xacro"/>
+<param name="boat" command="$(find xacro)/xacro --inorder '$(find gps_nav)/urdf/vehicle.xacro'"/>
+
+<node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_boat"/>
+<node pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" name="rob_joint_gui"/>
+<node pkg="joint_state_publisher" type="joint_state_publisher" name="rob_joint"/>
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find gps_nav)/launch/config.rviz"/>
+
+</launch>

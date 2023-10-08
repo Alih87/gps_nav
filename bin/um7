@@ -1,0 +1,4 @@
+import gps_nav.um7
+
+if __name__ == '__main__':
+	pass

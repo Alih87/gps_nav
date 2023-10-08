@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<robot name="vehicle" xmlns:xacro="http://www.ros.org/wiki/xacro">
+	<link name="base_link">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<geometry>
+				<box size="1 1 1"/>
+			</geometry>
+		</visual>
+	</link>
+
+	<joint name="base_link__link1" type="fixed">
+	
+</joint>
+
+	<link name="link1">
+                <visual>
+                        <origin rpy="0 0 0.5" xyz="0 0 0.2"/>
+                        <geometry>
+                                <box size="0.6 0.6 0.45" />
+                        </geometry>
+                </visual>
+        </link>
+
+</robot>
