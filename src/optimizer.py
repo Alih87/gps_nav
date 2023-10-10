@@ -27,12 +27,12 @@ def get_state(data):
 def get_dest_xy_pose():
     rospy.init_node('optimizer', anonymous=False)
     rospy.Subscriber('final_pos', pose_xy, get_dest_state)
-    rospy.sleep(0.1)
+    rospy.sleep(0.01)
 
 def get_xy_pose():
     rospy.init_node('optimizer', anonymous=False)
     rospy.Subscriber('odom_pose', pose_xy, get_state)
-    rospy.sleep(0.1)
+    rospy.sleep(0.01)
 
 def dist_to_go():
     rospy.init_node('optimizer', anonymous=False)
@@ -43,16 +43,53 @@ def dist_to_go():
     theta = atan2(y, x)*(180/pi) - curr_theta
     
     pub.publish(x, y, theta)
-    rospy.sleep(0.1)
+    rospy.sleep(0.01)
 
 ##########################################################
 
+def calculate_angle(y, x):
+	if x > 0:
+		return atan(y/x)*(180/pi)
+	if x==0 and y > 0:
+		return (pi/2)*(180/pi)
+	if x==0 and y < 0:
+		return (-pi/2)*(180/pi)
+	if x < 0 and y >= 0:
+		return (atan(y/x) + pi)*(180/pi)
+	if x < 0 and y < 0:
+		return (atan(y/x) - pi)*(180/pi)
+
+def get_dest_pose():
+    rospy.init_node('optimizer', anonymous=False)
+    rospy.Subscriber('final_pos', pose_xy, get_dest_state)
+    rospy.sleep(0.01)
+
+def get_curr_pose():
+    rospy.init_node('optimizer', anonymous=False)
+    rospy.Subscriber('odom_pose', pose_xy, get_state)
+    rospy.sleep(0.01)
+
+def to_go():
+    rospy.init_node('optimizer', anonymous=False)
+    pub = rospy.Publisher('feedback', pose_xy, queue_size=30)
+    global x, y, theta
+    x = dest_x - curr_x
+    y = dest_y - curr_y
+    theta = calculate_angle(y, x) - curr_theta
+    
+    pub.publish(x, y, theta)
+    rospy.sleep(0.01)
+
 if __name__ == '__main__':
-    print("[ INFO] Initialized Optimization Node.")
+    print("[INFO] Initialized Optimization. Node.")
     while not rospy.is_shutdown():
-        get_xy_pose()
-        get_dest_xy_pose()
-        dist_to_go()
+        get_curr_pose()
+        get_dest_pose()
+        to_go()
+
+	#get_xy_pose()
+        #get_dest_xy_pose()
+        #dist_to_go()
         # print("x : ", dest_x - curr_x)
         # print("y : ", dest_y - curr_y)
         # print("theta : ", dest_theta - curr_theta, "\n\n")
