@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import time
 from collections import deque
 from struct import pack
@@ -42,13 +42,15 @@ class GPS(object):
 		msg_list = msg.split(',')
 		msg_list[-1] = msg_list[-1][1:]
 
+		#print(dict(zip(self.frame_k, msg_list)))		
+
 		return dict(zip(self.frame_k, msg_list))
 
 
 if __name__ == '__main__':
 	CONNECTED = False
-	for i in range(5):
-		if i == 4 and not CONNECTED:
+	for i in range(21):
+		if i == 21 and not CONNECTED:
 			print("\n[INFO] No Port found!\n")
 			break
 		try:
@@ -65,5 +67,5 @@ if __name__ == '__main__':
 			gps.read()
 			print(gps.parse())
 		except:
-			pass
+			print('Here at '+str(i))
 

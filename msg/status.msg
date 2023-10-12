@@ -1,0 +1,12 @@
+string engine
+string winch
+string stop
+string mode
+string forward
+string measure
+string lift_up
+string feeder
+string LT
+string RT
+string F_sp
+string F_amt

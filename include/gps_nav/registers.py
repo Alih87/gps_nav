@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from math import pi, atan
+from math import pi, atan, atan2
 
 class Registers(object):
 	def __init__(self):
@@ -36,6 +36,9 @@ class Registers(object):
 		if x < 0 and y < 0:
 			return atan(y/x) - pi
 
+	def calculate_angle2(self, y, x):
+		return atan2(y,x)
+
 	def take_2s_comp(self, x, bits=16):
 		if (x & (1 << (bits-1))) is not 0:
 			x = x - (1 << bits)
@@ -54,7 +57,7 @@ class Registers(object):
 			x = self.take_2s_comp((x_u << 8) | x_l)
 			y = self.take_2s_comp((y_u << 8) | y_l)
 			#print(x,y,"\n")
-			theta = self.calculate_angle(y, x)
+			theta = self.calculate_angle2(y, x)
 
 			return {'theta':float(theta*(180/pi))}
 

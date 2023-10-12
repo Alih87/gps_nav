@@ -132,22 +132,22 @@ class UM7(object):
 			#print(self.reg.read_packet(data).values())
 			return self.reg.read_packet(data)['theta']
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
 
-#	serial_port = serial.Serial(
-#			port="/dev/ttyTHS1",
-#			baudrate=115200,
-#			bytesize=serial.EIGHTBITS,
-#			parity=serial.PARITY_NONE,
-#			stopbits=serial.STOPBITS_ONE)
+	serial_port = serial.Serial(
+			port="/dev/ttyTHS1",
+			baudrate=115200,
+			bytesize=serial.EIGHTBITS,
+			parity=serial.PARITY_NONE,
+			stopbits=serial.STOPBITS_ONE)
 	
-#	print("[INFO] Establishing UART Communication with UM7 Orientation Device ...")
-#	#time.sleep(1)
-#
-#	reg = Registers()
-#	obj = UM7(serial_port, reg)
-#
-#	print(obj.get_data())
+	print("[INFO] Establishing UART Communication with UM7 Orientation Device ...")
+	#time.sleep(1)
+
+	reg = Registers()
+	obj = UM7(serial_port, reg)
+
+	#print(obj.get_data())
 	#while True:
 	#print(obj.send_read_cmd(100))
 	#	time.sleep(0.25)

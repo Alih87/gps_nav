@@ -19,6 +19,7 @@ def get_utm(data):
     lat, long = data.lat, data.lon
     X, Y, zo, ne = from_latlon(lat, long)
     X, Y = X - CENTER[0], Y - CENTER[1]
+    X, Y = X, Y
     # ZONE = str(zo)+ne
 
 def get_heading(data):
@@ -39,7 +40,7 @@ def mag_sub():
 def utm_pub():
     global X, Y, ZONE
     rospy.init_node('gps_pose', anonymous=False)
-    pub = rospy.Publisher('odom_pose', pose_xy, queue_size=10)
+    pub = rospy.Publisher('odom_pose', coordinates, queue_size=10)
     pub.publish(X,Y,HEADING)
     rospy.sleep(0.01)
 

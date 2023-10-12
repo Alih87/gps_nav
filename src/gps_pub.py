@@ -4,11 +4,14 @@ import rospy, serial
 from gps_nav.msg import latlon_gps
 from gps_nav.gps_device import GPS
 
-def loc_pub(X, Y):
+X, Y = 0, 0
+
+def loc_pub(x, y):
+	global X, Y
 	rospy.init_node('gps_raw', anonymous=False)
 	pub = rospy.Publisher('gps_pos', latlon_gps, queue_size=10)
 	try:
-		X, Y = float(X), float(Y)
+		X, Y = float(x)/100.0, float(y)/100.0
 	except:
 		X, Y = 0, 0
 	pub.publish(X,Y)
@@ -35,7 +38,8 @@ if __name__ == '__main__':
 			while not rospy.is_shutdown():
 				gps.read()
 				frame = gps.parse()
-				loc_pub(frame['lat'], frame['lon'])
+				#print(frame)
+				loc_pub(frame['dir_lat'], frame['dir_lon'])
 		except:
 			pass
 

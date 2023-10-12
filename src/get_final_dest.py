@@ -5,8 +5,7 @@ from gps_nav.msg import coordinates, pose_xy
 from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, pi
 
-x, y, theta = [], [], []
-idx = 0
+global x, y, theta, idx = [], [], [], 0
 
 def user_input(xin, yin, theta_in):
     global x, y, theta
@@ -16,14 +15,14 @@ def user_input(xin, yin, theta_in):
 
 def done_callback(data):
 	global idx
-	if bool(data):
+	if data:
 		idx += 1
 	else:
 		pass
 	
 def publish_curr_final_pos(i):
     rospy.init_node("current_final_pos", anonymous=False)
-    pub = rospy.Publisher("final_pos", pose_xy, queue_size=10)
+    pub = rospy.Publisher("final_pos", coordinates, queue_size=10)
     pub.publish(x[i], y[i], theta[i])
 
 def complete_flag_sub():
@@ -40,10 +39,14 @@ if __name__ == '__main__':
 		assert len(x) == len(y) and len(y) == len(theta) and len(x) == len(theta)
 	except:
 		print("[INFO] Assertion Failed. Check number of destination TM coordinates.")
-		while(True)
+		while(True):
+			pass
 	print("\n[ INFO] Publishing destination information ...\n")
 	while not rospy.is_shutdown():
-		publish_curr_final_pos(i)
+		try:
+			publish_curr_final_pos(i)
+		except IndexError:
+			print(['\n[INFO] Still waiting for data input ...'])
 		complete_flag_sub()
 		if idx => len(x):
 			print("\n[INFO] Final destination reached.")
