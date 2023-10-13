@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
 from gps_nav.msg import coordinates, pose_xy, latlon_gps, heading_ang

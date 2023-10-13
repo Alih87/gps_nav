@@ -2,11 +2,12 @@
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
 from gps_nav.msg import coordinates, pose_xy, flag
-from sbg_driver.msg import SbgGpsPos, SbgMag
+#from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, atan2, pi
 
 
-global theta_done, linear_done = False, False
+global theta_done, linear_done
+theta_done, linear_done = False, False
 curr_x, curr_y, curr_theta = 0, 0, 0
 dest_x, dest_y, dest_theta = 0, 0, 0
 x, y, theta = 0, 0, 0
@@ -61,7 +62,7 @@ def calculate_angle(y, x):
 	if x < 0 and y < 0:
 		return (atan(y/x) - pi)*(180/pi)
 
-def calculate_angle2(self, y, x):
+def calculate_angle2(y, x):
 		return atan2(y,x)*(180/pi)
 
 def make_done_false():
@@ -75,12 +76,12 @@ def update_done_flag(done=False):
 
 def get_dest_pose():
     rospy.init_node('optimizer', anonymous=False)
-    rospy.Subscriber('final_pos', pose_xy, get_dest_state)
+    rospy.Subscriber('final_pos', coordinates, get_dest_state)
     rospy.sleep(0.01)
 
 def get_curr_pose():
     rospy.init_node('optimizer', anonymous=False)
-    rospy.Subscriber('odom_pose', pose_xy, get_state)
+    rospy.Subscriber('odom_pose', coordinates, get_state)
     rospy.sleep(0.01)
 
 def to_go():
@@ -107,7 +108,7 @@ def to_go():
     rospy.sleep(0.01)
 
 if __name__ == '__main__':
-    print("[INFO] Initialized Optimization. Node.")
+    print("[INFO] Initialized Optimization Node.")
     while not rospy.is_shutdown():
         get_curr_pose()
         get_dest_pose()

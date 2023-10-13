@@ -56,6 +56,9 @@ catkin_python_setup()
    pose_xy.msg
    latlon_gps.msg
    heading_ang.msg
+   can_pose.msg
+   flag.msg
+   status.msg
  )
 
 ## Generate services in the 'srv' folder

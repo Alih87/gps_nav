@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
-from gps_nav.msg import coordinates, pose_xy
-from sbg_driver.msg import SbgGpsPos, SbgMag
+from gps_nav.msg import coordinates, pose_xy, flag
+#from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, pi
-
-global x, y, theta, idx = [], [], [], 0
 
 def user_input(xin, yin, theta_in):
     global x, y, theta
@@ -15,12 +13,12 @@ def user_input(xin, yin, theta_in):
 
 def done_callback(data):
 	global idx
-	if data:
+	if data.flag:
 		idx += 1
 	else:
 		pass
 	
-def publish_curr_final_pos(i):
+def publish_curr_final_pos(x, y, theta, i):
     rospy.init_node("current_final_pos", anonymous=False)
     pub = rospy.Publisher("final_pos", coordinates, queue_size=10)
     pub.publish(x[i], y[i], theta[i])
@@ -31,10 +29,21 @@ def complete_flag_sub():
 	rospy.sleep(0.01)
 
 if __name__ == '__main__':
-	#easting = rospy.get_param("/dest_pos_pub/easting")
-	#northing = rospy.get_param("/dest_pos_pub/northing")
-	#heading = rospy.get_param("/dest_pos_pub/heading")
-	user_input(easting, northing, heading)
+	wp_1 = rospy.get_param("/dest_pos_pub/wp_1")
+	wp_2 = rospy.get_param("/dest_pos_pub/wp_2")
+	wp_3 = rospy.get_param("/dest_pos_pub/wp_3")
+	wp_4 = rospy.get_param("/dest_pos_pub/wp_4")
+
+	x, y, theta = [],[],[]
+	idx = 0
+	
+	ls = [wp_1,wp_2,wp_3,wp_4]
+	for s in ls:
+		X, Y = s.split(',')
+		x.append(float(X))
+		y.append(float(Y))
+		theta.append(float(0))
+	#user_input(easting, northing, heading)
 	try:
 		assert len(x) == len(y) and len(y) == len(theta) and len(x) == len(theta)
 	except:
@@ -43,11 +52,8 @@ if __name__ == '__main__':
 			pass
 	print("\n[ INFO] Publishing destination information ...\n")
 	while not rospy.is_shutdown():
-		try:
-			publish_curr_final_pos(i)
-		except IndexError:
-			print(['\n[INFO] Still waiting for data input ...'])
+		publish_curr_final_pos(x, y, theta, idx)
 		complete_flag_sub()
-		if idx => len(x):
+		if idx >= len(x):
 			print("\n[INFO] Final destination reached.")
 			break

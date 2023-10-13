@@ -10,7 +10,7 @@ TOP_ANGULAR_SPEED = 6
 linear_spd = 4
 angular_spd = 4
 
-x_est, y_est, theta_est, theta_done, linear_done = 0, 0, 0
+x_est, y_est, theta_est, theta_done, linear_done = 0, 0, 0, False, False
 # x_dest, y_dest, theta_dest = 0, 0, 0
 
 def regulate(linear_spd, angular_spd):
@@ -54,10 +54,10 @@ def boat_ctrl_command():
 	linear_spd, angular_spd = regulate(linear_spd, angular_spd)
 
 	hyp = (x_est**2 + y_est**2)**0.5
-	if int(theta_est) is not 0 and hyp > 0.1:
+	if not theta_done and hyp > 0.5:
 		rt, lt = angular_spd, -angular_spd
 
-	elif (theta_done and not linear_done) or hyp > 0.1:
+	elif (theta_done and not linear_done) and hyp > 0.5:
 		rt, lt = linear_spd, linear_spd
 
 	else:
