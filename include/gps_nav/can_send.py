@@ -25,7 +25,7 @@ class serial_can(object):
 				self.data += self._port.read()
 			if len(self.data) > 41:
 				break
-		print(self.data)
+		#print(self.data)
 
 	def mode_byte_status(self, byte):
 		mode = (byte >> 6) & 0xf
@@ -111,12 +111,13 @@ class serial_can(object):
 			}
 
 	def get_status(self):
-		data = self.data[5:]
+		data = self.data.split('\r')
+		data_102, data_103 = data[0][5:], data[1][5:]
 		bytes = []
-		for i in range(0, len(data)-1, 2):
-			bytes.append(data[i:i+2])
+		for i in range(0, len(data_102)-1, 2):
+			bytes.append(data_102[i:i+2])
 		#print(bytes)
-		bytes_hex = map(lambda x: int(x, base=16), bytes)
+		bytes_hex = map(lambda x: int(str(x), base=16), bytes)
 		#print(bytes_hex)
 		mode_st = self.mode_byte_status(bytes_hex[0])
 		dir_st = self.dir_byte_status(bytes_hex[1])
@@ -143,10 +144,10 @@ if __name__ == '__main__':
 	canbus = CAN_ISOBUS()
 
 	cmd_dict = {
-			'engine' : 2,
+			'engine' : 0,
 			'winch' : 0,
 			'stop' :  0,
-			'mode' : AUTO_CTRL,
+			'mode' : REMOTE_CTRL,
 
 			'forward': 0,
 			'measure': 0,
@@ -159,8 +160,8 @@ if __name__ == '__main__':
 			'F_amt':0
 		    }
 
-	cmd = str(canbus.set_cmd(cmd_dict)).encode()
-	print(cmd)
+	#cmd = str(canbus.set_cmd(cmd_dict)).encode()
+	#print(cmd)
 	for i in range(11):
 		try:
 			serial_port = serial.Serial(
@@ -177,6 +178,8 @@ if __name__ == '__main__':
 				print('[INFO] Could not connect to serial device.')
 
 	slcan = serial_can(serial_port)
+	cmd = str(canbus.set_cmd(cmd_dict)).encode()
+	print(cmd)
 	slcan.send_rcv(cmd)
 	slcan.get_status()			
 

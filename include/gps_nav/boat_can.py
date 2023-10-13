@@ -10,6 +10,7 @@ class CAN_ISOBUS(object):
 	def __init__(self):
 		#self.arb_id = arb_id
 		self.DATA = [0, 0, 0, 0, 0, 0]
+		self.DATA = list(map(int, self.DATA))
 		#self.bins = CMD_BIN
 		#self.incoming = ""
 
