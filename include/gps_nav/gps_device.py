@@ -47,25 +47,25 @@ class GPS(object):
 		return dict(zip(self.frame_k, msg_list))
 
 
-if __name__ == '__main__':
-	CONNECTED = False
-	for i in range(21):
-		if i == 21 and not CONNECTED:
-			print("\n[INFO] No Port found!\n")
-			break
-		try:
-			serial_port = serial.Serial(
-				port="/dev/ttyUSB"+str(i),
-				baudrate=115200,
-				bytesize=serial.EIGHTBITS,
-				parity=serial.PARITY_NONE,
-				stopbits=serial.STOPBITS_ONE
-						   )
-			print("\n[INFO] Connection established at port USB"+str(i))
-			CONNECTED = True
-			gps = GPS(serial_port)
-			gps.read()
-			print(gps.parse())
-		except:
-			print('Here at '+str(i))
+#if __name__ == '__main__':
+#	CONNECTED = False
+#	for i in range(21):
+#		if i == 21 and not CONNECTED:
+#			print("\n[INFO] No Port found!\n")
+#			break
+#		try:
+#			serial_port = serial.Serial(
+#				port="/dev/ttyUSB"+str(i),
+#				baudrate=115200,
+#				bytesize=serial.EIGHTBITS,
+#				parity=serial.PARITY_NONE,
+#				stopbits=serial.STOPBITS_ONE
+#						   )
+#			print("\n[INFO] Connection established at port USB"+str(i))
+#			CONNECTED = True
+#			gps = GPS(serial_port)
+#			gps.read()
+#			print(gps.parse())
+#		except:
+#s			print('Here at '+str(i))
 

@@ -116,7 +116,8 @@ if __name__ == '__main__':
 
 		cmd = canbus.set_cmd(cmd_dict)
 		if change:
-			slcan.send_rcv(cmd)
-			slcan.get_status()
-			pub_status(cmd_dict)
+			pass
+			#slcan.send_rcv(cmd)
+			#slcan.get_status()
+			#pub_status(cmd_dict)
 		

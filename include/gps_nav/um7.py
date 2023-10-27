@@ -82,10 +82,9 @@ class UM7(object):
 		self.read()
 		msg = self.full_packets[-1]
 		#print(msg)
-		calc_checksum = self.HEADER + msg[0] + msg[1] + sum(msg[2:4*(msg[0]>>2 & 0x0f)+2])
-		rcv_checksum = msg[2+4*(msg[0]>>2 & 0x0f)] << 8 | msg[2+4*(msg[0]>>2 & 0x0f)+1]
-
 		try:
+			calc_checksum = self.HEADER + msg[0] + msg[1] + sum(msg[2:4*(msg[0]>>2 & 0x0f)+2])
+			rcv_checksum = msg[2+4*(msg[0]>>2 & 0x0f)] << 8 | msg[2+4*(msg[0]>>2 & 0x0f)+1]
 			assert calc_checksum == rcv_checksum
 		except:
 			print("[INFO] Bad Checksum.")

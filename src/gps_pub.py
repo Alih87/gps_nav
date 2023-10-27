@@ -18,8 +18,8 @@ def loc_pub(x, y):
 	rospy.sleep(0.01)
 
 if __name__ == '__main__':
-	for i in range(5):
-		if i == 5:
+	for i in range(10):
+		if i == 9:
 			print("\n[INFO] No Port found!\n")
 			break
 		try:
@@ -35,12 +35,14 @@ if __name__ == '__main__':
 
 			print("\n[INFO] Connection established at port USB"+str(i))
 			
-			while not rospy.is_shutdown():
-				gps.read()
-				frame = gps.parse()
-				#print(frame)
-				loc_pub(frame['dir_lat'], frame['dir_lon'])
+			
 		except:
 			pass
+
+	while not rospy.is_shutdown():
+		gps.read()
+		frame = gps.parse()
+		print(frame)
+		loc_pub(frame['dir_lat'], frame['dir_lon'])
 
 

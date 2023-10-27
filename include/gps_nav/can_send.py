@@ -144,12 +144,12 @@ if __name__ == '__main__':
 	canbus = CAN_ISOBUS()
 
 	cmd_dict = {
-			'engine' : 0,
+			'engine' : 2,
 			'winch' : 0,
 			'stop' :  0,
-			'mode' : REMOTE_CTRL,
+			'mode' : AUTO_CTRL,
 
-			'forward': 0,
+			'forward': 2,
 			'measure': 0,
 			'lift_up': 0,
 			'feeder' : 0,

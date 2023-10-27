@@ -35,7 +35,7 @@ def gps_sub():
 def mag_sub():
     rospy.init_node('gps_pose', anonymous=False)
     rospy.Subscriber('um7_heading', heading_ang, get_heading)
-    rospy.sleep(0.01)
+
 
 def utm_pub():
     global X, Y, ZONE
@@ -66,12 +66,12 @@ def odom_pub():
     rospy.init_node('gps_pose', anonymous=False)
     pub = rospy.Publisher('odom_pose', pose_xy, queue_size=30)
     pub.publish(X,Y,HEADING)
-    rospy.sleep(0.1)
+    rospy.sleep(0.01)
 
 def odom_sub():
     rospy.init_node('gps_pose', anonymous=False)
     rospy.Subscriber('/odom', Odometry, get_state)
-    rospy.sleep(0.1)
+    rospy.sleep(0.01)
 
 #######################################################
 
