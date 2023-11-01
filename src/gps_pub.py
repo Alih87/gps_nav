@@ -31,6 +31,7 @@ if __name__ == '__main__':
 				stopbits=serial.STOPBITS_ONE
 						   )
 			gps = GPS(serial_port)
+			print("\n[INFO] Connection established at port USB"+str(i))
 
 			while not rospy.is_shutdown():
 				ret = gps.read()
@@ -40,8 +41,6 @@ if __name__ == '__main__':
 				print(frame)
 				loc_pub(frame['dir_lat'], frame['dir_lon'])
 
-			print("\n[INFO] Connection established at port USB"+str(i))
-			
 			
 		except:
 			pass
