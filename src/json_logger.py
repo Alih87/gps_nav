@@ -85,7 +85,7 @@ if __name__ == '__main__':
 		data2['time'] = [dt]
 		data2['data'] = [T2]
 
-		if (now_t >= prev_t + 5) or (now_t >= (prev_t-60) + 5):
+		if (now_t >= prev_t + 1) or (now_t >= (prev_t-60) + 1):
 			with open(t1_path, "w") as f1:
 				json.dump(data1, f1)
 				f1.close()
