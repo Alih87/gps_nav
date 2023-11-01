@@ -59,6 +59,7 @@ catkin_python_setup()
    can_pose.msg
    flag.msg
    status.msg
+   table1.msg
  )
 
 ## Generate services in the 'srv' folder

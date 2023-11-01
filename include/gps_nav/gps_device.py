@@ -21,19 +21,27 @@ class GPS(object):
 		'''
 		Parse the incoming bytes into separate bytes.
 		'''
+		wait_idx = 0
 		try:
 			while True:
 				if self.port.inWaiting() > 0:
 					self.buf += self.port.read()
-					if self.head in self.buf:
-						self.buf = "".encode()
-						self.has_head = True
-
 					if self.has_head and "\r".encode() in self.buf:
 						self.msgs.append(self.buf[:-1])
 						self.buf = "".encode()
 						break
+					
+					if self.head in self.buf:
+						self.buf = "".encode()
+						self.has_head = True
 						
+					#if not (self.has_head and "\r".encode() in self.buf) and not (self.head in self.buf):
+					#	wait_idx += 1
+					#if wait_idx >= 50:
+					#	self.buf = "".encode()
+					#	wait_idx = 0
+					#	return True
+											
 		except KeyboardInterrupt:
 			print("\nExiting...\n")
 

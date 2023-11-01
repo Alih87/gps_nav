@@ -5,7 +5,7 @@
     <arg name="wp_3" value="6,2"/>
     <arg name="wp_4" value="1,2"/>
 
-    
+    <node name="command_sender" pkg="gps_nav" type="can_cmd_pub.py"/>
     <node name="current_gps_pub" pkg="gps_nav" type="gps_pub.py"/>
     <node name="current_heading_pub" pkg="gps_nav" type="heading_pub.py"/>
 
@@ -19,6 +19,6 @@
 
     <node name="optimizer_node" pkg="gps_nav" type="optimizer.py"/>
     <node name="move_command" pkg="gps_nav" type="moveCmd.py"/>
-    <node name="command_sender" pkg="gps_nav" type="can_cmd_pub.py"/>
+    <node name="Json_data" pkg="gps_nav" type="json_logger.py"/>
 
 </launch>

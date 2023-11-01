@@ -5,8 +5,8 @@ import sys
 from gps_nav.msg import can_pose
 from gps_nav.msg import pose_xy
 
-TOP_LINEAR_SPEED = 6
-TOP_ANGULAR_SPEED = 6
+TOP_LINEAR_SPEED = 4
+TOP_ANGULAR_SPEED = 4
 linear_spd = 4
 angular_spd = 4
 

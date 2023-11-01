@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy
-import sys
+import sys, serial
 from gps_nav.boat_can import CAN_ISOBUS
 from gps_nav.can_send import serial_can
 from gps_nav.msg import can_pose, status
@@ -96,28 +96,28 @@ if __name__ == '__main__':
 
 	for i in range(11):
 		try:
-			serial_port = serial.Serial(
-				port="/dev/ttyUSB"+str(i),
-				baudrate=115200,
-				bytesize=serial.EIGHTBITS,
-				parity=serial.PARITY_NONE,
-				stopbits=serial.STOPBITS_ONE)
+			#serial_port = serial.Serial(
+			#	port="/dev/ttyUSB"+str(i),
+			#	baudrate=115200,
+			#	bytesize=serial.EIGHTBITS,
+			#	parity=serial.PARITY_NONE,
+			#	stopbits=serial.STOPBITS_ONE)
+			#slcan = serial_can(serial_port)
+			while not rospy.is_shutdown():
+				pub_status(cmd_dict)
+				#change = can_pose_sub()
+				#change = finish_flag_sub()
+				#cmd = str(canbus.set_cmd(cmd_dict)).encode()
+				#print(cmd)
+				#slcan.send_rcv(cmd)
+				#slcan.get_status()
 			print("[INFO] Connected on port "+str(i))
-			break
+			#break
 
 		except:
 			if i == 10:
 				print('[INFO] Could not connect to serial device.')
+				while(True):
+					pass
 	
-	s_can = serial_can(serial_port)
-	while not rospy.is_shutdown():
-		change = can_pose_sub()
-		change = finish_flag_sub()
-
-		cmd = canbus.set_cmd(cmd_dict)
-		if change:
-			pass
-			#slcan.send_rcv(cmd)
-			#slcan.get_status()
-			#pub_status(cmd_dict)
 		

@@ -112,6 +112,7 @@ class serial_can(object):
 
 	def get_status(self):
 		data = self.data.split('\r')
+		print(data)
 		data_102, data_103 = data[0][5:], data[1][5:]
 		bytes = []
 		for i in range(0, len(data_102)-1, 2):
@@ -127,7 +128,6 @@ class serial_can(object):
 		bat_st = self.battery_status(bytes_hex[6], bytes_hex[7])
 		
 		print(mode_st, dir_st, track_sp_st, feed_spr_st, feed_amt_st, bat_st)
-
 		
 
 if __name__ == '__main__':
@@ -176,6 +176,8 @@ if __name__ == '__main__':
 		except:
 			if i == 10:
 				print('[INFO] Could not connect to serial device.')
+				while(True):
+					pass
 
 	slcan = serial_can(serial_port)
 	cmd = str(canbus.set_cmd(cmd_dict)).encode()

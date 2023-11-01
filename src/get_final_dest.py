@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
-from gps_nav.msg import coordinates, pose_xy, flag
+from gps_nav.msg import coordinates, pose_xy, flag, table1
 #from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, pi
 
@@ -22,6 +22,11 @@ def publish_curr_final_pos(x, y, theta, i):
     rospy.init_node("current_final_pos", anonymous=False)
     pub = rospy.Publisher("final_pos", coordinates, queue_size=10)
     pub.publish(x[i], y[i], theta[i])
+
+def publish_dest_wp(wp_ls):
+    rospy.init_node("current_final_pos", anonymous=False)
+    pub = rospy.Publisher("wp_table1", table1, queue_size=10)
+    pub.publish(wp_ls[0], wp_ls[1], wp_ls[2], wp_ls[3])
 
 def complete_flag_sub():
 	rospy.init_node('current_final_pos', anonymous=False)
@@ -53,7 +58,8 @@ if __name__ == '__main__':
 	print("\n[ INFO] Publishing destination information ...\n")
 	while not rospy.is_shutdown():
 		publish_curr_final_pos(x, y, theta, idx)
+		publish_dest_wp(ls)
 		complete_flag_sub()
-		if idx >= len(x):
-			print("\n[INFO] Final destination reached.")
-			break
+		#if idx >= len(x):
+		#	print("\n[INFO] Final destination reached.")
+		#	break
