@@ -25,7 +25,9 @@ class GPS(object):
 		try:
 			while True:
 				if self.port.inWaiting() > 0:
+					wait_idx = 0
 					self.buf += self.port.read()
+					print(self.buf)
 					if self.has_head and "\r".encode() in self.buf:
 						self.msgs.append(self.buf[:-1])
 						self.buf = "".encode()
@@ -34,6 +36,10 @@ class GPS(object):
 					if self.head in self.buf:
 						self.buf = "".encode()
 						self.has_head = True
+	
+					if len(self.buf) >= 999:
+						self.buf = "".encode()
+						break
 						
 					#if not (self.head in self.buf) and len(self.buf) >= len(self.head) and not found:
 					#	self.buf = "".encode()
@@ -42,6 +48,12 @@ class GPS(object):
 					#	self.buf = "".encode()
 					#	wait_idx = 0
 					#	return True
+
+				else:
+					wait_idx += 1
+					if wait_idx == 500000:
+						break
+				
 										
 		except KeyboardInterrupt:
 			print("\nExiting...\n")

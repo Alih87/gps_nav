@@ -29,7 +29,12 @@ def sub_port_num():
 
 
 if __name__ == '__main__':
+	for _ in range(10):
+		sub_port_num()
+
 	for i in range(10):
+		if i == PORT:
+			continue
 		if i == 9:
 			sys.stdout.write("\n[INFO] No Port found!\n")
 			break
@@ -53,9 +58,9 @@ if __name__ == '__main__':
 					break
 				frame = gps.parse()
 				print(frame)
+				pub_port_num(i)
 				loc_pub(frame['dir_lat'], frame['dir_lon'])
 
 			
 		except:
-			pass
-
+			continue
