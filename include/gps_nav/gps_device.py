@@ -35,13 +35,14 @@ class GPS(object):
 						self.buf = "".encode()
 						self.has_head = True
 						
-					#if not (self.has_head and "\r".encode() in self.buf) and not (self.head in self.buf):
-					#	wait_idx += 1
+					#if not self.head in buf and len(self.buf) >= len(self.head):
+					#	self.buf = "".encode()
+					#	return True
 					#if wait_idx >= 50:
 					#	self.buf = "".encode()
 					#	wait_idx = 0
 					#	return True
-											
+										
 		except KeyboardInterrupt:
 			print("\nExiting...\n")
 
