@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
-import rospy
+import rospy, os
 import sys, json, datetime
 from gps_nav.msg import table1, status
 from gps_nav.msg import latlon_gps
+
+home = os.environ["HOME"]
 
 CURR_GPS = "0, 0"
 T1, T2 = dict(), dict()
@@ -62,8 +64,8 @@ def latlon_sub():
 	rospy.sleep(0.01)
 
 if __name__ == '__main__':
-	t1_path = "/home/pi/share/table1.json"
-	t2_path = "/home/pi/share/table2.json"
+	t1_path = home+"/share/table1.json"
+	t2_path = home+"/share/table2.json"
 	upload_time = 0
 	data1, data2 = dict(), dict()
 	dt = str(datetime.datetime.now())

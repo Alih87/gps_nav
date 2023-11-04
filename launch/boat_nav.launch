@@ -6,8 +6,9 @@
     <arg name="wp_4" value="1,2"/>
 
     <node name="command_sender" pkg="gps_nav" type="can_cmd_pub.py"/>
-    <node name="current_gps_pub" pkg="gps_nav" type="gps_pub.py"/>
-    <node name="current_heading_pub" pkg="gps_nav" type="heading_pub.py"/>
+    <node name="gps1_loc" pkg="gps_nav" type="gps1_pub.py"/>
+    <node name="gps2_loc" pkg="gps_nav" type="gps2_pub.py"/>
+    <node name="current_heading_pub" pkg="gps_nav" type="dual_heading_pub.py"/>
 
     <node name="dest_pos_pub" pkg="gps_nav" type="get_final_dest.py">
     	<param name="wp_1" value="$(arg wp_1)"/>
