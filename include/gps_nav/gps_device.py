@@ -35,7 +35,7 @@ class GPS(object):
 						self.buf = "".encode()
 						self.has_head = True
 						
-					#if not self.head in buf and len(self.buf) >= len(self.head):
+					#if not (self.head in self.buf) and len(self.buf) >= len(self.head) and not found:
 					#	self.buf = "".encode()
 					#	return True
 					#if wait_idx >= 50:

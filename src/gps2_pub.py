@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, serial, sys
-from gps_nav.msg import latlon_gps
+from gps_nav.msg import latlon_gps, heading_ang
 from gps_nav.gps_device import GPS
 
-X, Y = 0, 0
+X, Y, PORT = 0, 0, 0
 
 def loc_pub(x, y):
 	global X, Y
@@ -16,6 +16,17 @@ def loc_pub(x, y):
 		X, Y = 0, 0
 	pub.publish(X,Y)
 	rospy.sleep(0.01)
+
+def port_callback(data):
+	global PORT
+	if data.angle is not None:
+		PORT = int(data.angle)
+
+def sub_port_num():
+	rospy.init_node('dgps2', anonymous=False)
+	rospy.Subscriber('port_num', heading_ang, port_callback)
+	rospy.sleep(0.01)
+
 
 if __name__ == '__main__':
 	for i in range(10):

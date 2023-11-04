@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, serial, sys
-from gps_nav.msg import latlon_gps
+from gps_nav.msg import latlon_gps, heading_ang
 from gps_nav.gps_device import GPS
 
 X, Y = 0, 0
@@ -15,6 +15,12 @@ def loc_pub(x, y):
 	except:
 		X, Y = 0, 0
 	pub.publish(X,Y)
+	rospy.sleep(0.01)
+
+def pub_port_num(port_num):
+	rospy.init_node('dgps1', anonymous=False)
+	pub = rospy.Publisher('port_num', heading_ang, queue_size=10)
+	pub.publish(port_num)
 	rospy.sleep(0.01)
 
 if __name__ == '__main__':
@@ -42,6 +48,7 @@ if __name__ == '__main__':
 					break
 				frame = gps.parse()
 				print(frame)
+				pub_port_num(i)
 				loc_pub(frame['dir_lat'], frame['dir_lon'])
 
 			
