@@ -57,9 +57,12 @@ if __name__ == '__main__':
 			pass
 	print("\n[ INFO] Publishing destination information ...\n")
 	while not rospy.is_shutdown():
-		publish_curr_final_pos(x, y, theta, idx)
-		publish_dest_wp(ls)
-		complete_flag_sub()
+		if idx < len(ls):
+			publish_curr_final_pos(x, y, theta, idx)
+			publish_dest_wp(ls)
+			complete_flag_sub()
+		else:
+			break
 		#if idx >= len(x):
 		#	print("\n[INFO] Final destination reached.")
 		#	break

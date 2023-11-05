@@ -92,17 +92,30 @@ def to_go():
     y = dest_y - curr_y
     theta = calculate_angle2(y, x) - curr_theta
 
-    if abs(theta) < 3:
+    '''
+	Checks whether the current angle is within the 90 degree (at max) arc.
+    '''
+    if theta < -45 or theta > 45:
+	theta_done = False
+    else:
 	theta_done = True
-    if abs((x**2 + y**2)**0.5) < 1:
+
+    '''
+	Checks whether the current position is within 15 meters range (at max).
+    '''
+    if abs((x**2 + y**2)**0.5) < 15:
 	linear_done = True
+    else:
+	linear_done = False
 	
+    '''
+	If both angular and linear position is within the required range, complete the path and move to the next destination points.
+    '''
     if linear_done and theta_done:
 	theta_done, linear_done = False, False
 	update_done_flag(True)
     else:
 	update_done_flag()
-	
     
     pub.publish(x, y, theta, theta_done, linear_done)
     rospy.sleep(0.01)

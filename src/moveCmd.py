@@ -5,10 +5,11 @@ import sys
 from gps_nav.msg import can_pose
 from gps_nav.msg import pose_xy
 
-TOP_LINEAR_SPEED = 4
-TOP_ANGULAR_SPEED = 4
-linear_spd = 4
-angular_spd = 4
+TOP_LINEAR_SPEED = 50
+TOP_ANGULAR_SPEED = 50
+linear_spd = 50
+angular_spd = 50
+flag_grt, flag_sml = False, False
 
 x_est, y_est, theta_est, theta_done, linear_done = 0, 0, 0, False, False
 # x_dest, y_dest, theta_dest = 0, 0, 0
@@ -48,16 +49,36 @@ def boat_ctrl_command():
 	rospy.init_node('boat_ctrl', anonymous=False)
 	pub = rospy.Publisher('cmd_vel', can_pose, queue_size=30)
 
-	hyp = (x_est**2 + y_est**2)**0.5
-	global linear_spd, angular_spd
+	#hyp = (x_est**2 + y_est**2)**0.5
+	global linear_spd, angular_spd, flag_grt, flag_sml
 
 	linear_spd, angular_spd = regulate(linear_spd, angular_spd)
 
 	hyp = (x_est**2 + y_est**2)**0.5
-	if not theta_done and hyp > 0.5:
-		rt, lt = angular_spd, -angular_spd
+	if not theta_done and not linear_done:
+		if theta_est == 0:
+			rt, lt = 0, 0
+			pass
 
-	elif (theta_done and not linear_done) and hyp > 0.5:
+		elif theta_est/abs(theta_est) > 0:
+			if not flag_grt:
+				for _ in range(4):
+					rt, lt = 0, 0
+				flag_grt = True
+				flag_sml = False
+				rospy.sleep(1)
+			rt, lt = angular_spd, -angular_spd
+
+		elif theta_est/abs(theta_est) < 0:
+			if not flag_sml:
+				for _ in range(4):
+					rt, lt = 0, 0
+				flag_grt = False
+				flag_sml = True
+				rospy.sleep(1)
+			rt, lt = -angular_spd, angular_spd
+
+	elif theta_done and not linear_done:
 		rt, lt = linear_spd, linear_spd
 
 	else:
@@ -76,5 +97,5 @@ def feedback_ctrl_msg():
 
 if __name__ == '__main__':
     while not rospy.is_shutdown():
+	boat_ctrl_command()
         feedback_ctrl_msg()
-        boat_ctrl_command()

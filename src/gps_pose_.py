@@ -29,12 +29,12 @@ def get_heading(data):
 
 def gps_sub():
     rospy.init_node('gps_pose', anonymous=False)
-    rospy.Subscriber('gps_pos', latlon_gps, get_utm)
+    rospy.Subscriber('gps1_pos', latlon_gps, get_utm)
     rospy.sleep(0.01)
 
 def mag_sub():
     rospy.init_node('gps_pose', anonymous=False)
-    rospy.Subscriber('um7_heading', heading_ang, get_heading)
+    rospy.Subscriber('dgps_heading', heading_ang, get_heading)
 
 
 def utm_pub():
