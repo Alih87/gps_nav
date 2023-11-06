@@ -52,6 +52,7 @@ class GPS(object):
 				else:
 					wait_idx += 1
 					if wait_idx == 500000:
+						wait_idx = 0
 						break
 				
 										
@@ -59,13 +60,17 @@ class GPS(object):
 			print("\nExiting...\n")
 
 	def parse(self):
-		msg = self.msgs[-1].decode()
-		msg_list = msg.split(',')
-		msg_list[-1] = msg_list[-1][1:]
+		if len(self.msgs) > 0:
+			msg = self.msgs[-1].decode()
+			msg_list = msg.split(',')
+			msg_list[-1] = msg_list[-1][1:]
 
-		#print(dict(zip(self.frame_k, msg_list)))		
+			#print(dict(zip(self.frame_k, msg_list)))		
 
-		return dict(zip(self.frame_k, msg_list))
+			return dict(zip(self.frame_k, msg_list))
+
+		else:
+			return dict()
 
 
 #if __name__ == '__main__':

@@ -44,8 +44,8 @@ if __name__ == '__main__':
 
 			while not rospy.is_shutdown():
 				ret = gps.read()
-				if ret:
-					break
+				#if ret:
+				#	break
 				frame = gps.parse()
 				print(frame)
 				pub_port_num(i)
