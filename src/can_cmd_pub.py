@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy
-import sys, serial
+import sys, serial, time
 from gps_nav.boat_can import CAN_ISOBUS
 from gps_nav.can_send import serial_can
-from gps_nav.msg import can_pose, status
+from gps_nav.msg import can_pose, status, flag
 
-global called
+#flag = False
 called = False
 
 def finish_callback(data):
@@ -103,6 +103,7 @@ if __name__ == '__main__':
 				parity=serial.PARITY_NONE,
 				stopbits=serial.STOPBITS_ONE)
 			slcan = serial_can(serial_port)
+			time.sleep(0.1)
 			while not rospy.is_shutdown():
 				pub_status(cmd_dict)
 				change = can_pose_sub()
@@ -115,9 +116,8 @@ if __name__ == '__main__':
 			#break
 
 		except:
-			if i == 10:
-				print('[INFO] Could not connect to serial device.')
-				while(True):
-					pass
+			pass
+				#while(True):
+				#	pass
 	
 		

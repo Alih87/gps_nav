@@ -5,10 +5,10 @@ import sys
 from gps_nav.msg import can_pose
 from gps_nav.msg import pose_xy
 
-TOP_LINEAR_SPEED = 50
-TOP_ANGULAR_SPEED = 50
-linear_spd = 50
-angular_spd = 50
+TOP_LINEAR_SPEED = 10
+TOP_ANGULAR_SPEED = 10
+linear_spd = 10
+angular_spd = 10
 flag_grt, flag_sml = False, False
 
 x_est, y_est, theta_est, theta_done, linear_done = 0, 0, 0, False, False

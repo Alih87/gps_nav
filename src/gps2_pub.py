@@ -38,31 +38,31 @@ if __name__ == '__main__':
 		if i == 9:
 			sys.stdout.write("\n[INFO] No Port found!\n")
 			break
-		#try:
-		serial_port = serial.Serial(
-			port="/dev/ttyUSB"+str(i),
-			baudrate=115200,
-			bytesize=serial.EIGHTBITS,
-			parity=serial.PARITY_NONE,
-			stopbits=serial.STOPBITS_ONE
-					   )
-		if not serial_port.isOpen():
-			pass
-		else:
-			gps = GPS(serial_port)
-			sys.stdout.write("\n[INFO] Connection established at port USB"+str(i)+"\n")
+		try:
+			serial_port = serial.Serial(
+				port="/dev/ttyUSB"+str(i),
+				baudrate=115200,
+				bytesize=serial.EIGHTBITS,
+				parity=serial.PARITY_NONE,
+				stopbits=serial.STOPBITS_ONE
+						   )
+			time.sleep(1)
+			if not serial_port.isOpen():
+				pass
+			else:
+				gps = GPS(serial_port)
+				sys.stdout.write("\n[INFO] Connection established at port USB"+str(i)+"\n")
 
-		while not rospy.is_shutdown():
-			ret = gps.read()
-			#if ret:
-			#	break
-			frame = gps.parse()
-			if len(list(frame.keys())) == 0:
-				break
-			print(frame)
-			sub_port_num()
-			loc_pub(frame['dir_lat'], frame['dir_lon'])
+			while not rospy.is_shutdown():
+				ret = gps.read()
+				#if ret:
+				#	break
+				frame = gps.parse()
+				if len(list(frame.keys())) == 0:
+					break
+				sub_port_num()
+				loc_pub(frame['dir_lat'], frame['dir_lon'])
 
 			
-		#except:
-		#	pass
+		except:
+			pass

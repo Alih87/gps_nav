@@ -29,7 +29,7 @@ def get_heading(data):
 
 def gps_sub():
     rospy.init_node('gps_pose', anonymous=False)
-    rospy.Subscriber('gps1_pos', latlon_gps, get_utm)
+    rospy.Subscriber('gps_pos1', latlon_gps, get_utm)
     rospy.sleep(0.01)
 
 def mag_sub():

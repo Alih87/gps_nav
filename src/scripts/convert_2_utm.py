@@ -13,16 +13,16 @@ args = parser.parse_args()
 CENTER = (388731.70, 3974424.49)
 
 def get_utm(src, dst):
-    with open(src) as fr:
-        raw_pts = fr.readlines()
-    with open(dst, "w") as f:
-        for line in raw_pts:
-            lat_str, long_str = line.split(",")
-            X, Y, zo, ne = from_latlon(float(lat_str), float(long_str))
-	    X, Y = X - CENTER[0], Y - CENTER[1]
-            ZONE = str(zo)+ne
-            f.write(str(X)+","+str(Y)+","+str(ZONE)+"\n")
-        f.close()
+	with open(src) as fr:
+		raw_pts = fr.readlines()
+	with open(dst, "w") as f:
+		for line in raw_pts:
+		    lat_str, long_str = line.split(",")
+		    X, Y, zo, ne = from_latlon(float(lat_str), float(long_str))
+		    X, Y = X - CENTER[0], Y - CENTER[1]
+		    ZONE = str(zo)+ne
+		    f.write(str(X)+","+str(Y)+","+str(ZONE)+"\n")
+		f.close()
 
 if __name__ == "__main__":
     sys.stdout.write("[INFO] Converting Lat and Long to UTM ...\n")

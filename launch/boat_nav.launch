@@ -1,9 +1,9 @@
 <launch>
 
-    <arg name="wp_1" value="1,2"/>
-    <arg name="wp_2" value="4,2"/>
-    <arg name="wp_3" value="6,2"/>
-    <arg name="wp_4" value="1,2"/>
+    <arg name="wp_1" value="-156465.98980857083,-155514.9093946996"/>
+    <arg name="wp_2" value="-156465.98980857083,-155514.9093946996"/>
+    <arg name="wp_3" value="-156465.98980857083,-155514.9093946996"/>
+    <arg name="wp_4" value="-156465.98980857083,-155514.9093946996"/>
 
     <node name="command_sender" pkg="gps_nav" type="can_cmd_pub.py"/>
     <node name="gps1_loc" pkg="gps_nav" type="gps1_pub.py"/>

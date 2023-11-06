@@ -90,12 +90,12 @@ def to_go():
     global x, y, theta, theta_done, linear_done
     x = dest_x - curr_x
     y = dest_y - curr_y
-    theta = calculate_angle2(y, x) - curr_theta
+    theta = calculate_angle2(y, x) + curr_theta
 
     '''
 	Checks whether the current angle is within the 90 degree (at max) arc.
     '''
-    if theta < -45 or theta > 45:
+    if theta - curr_theta < -10 or theta - curr_theta > 10:
 	theta_done = False
     else:
 	theta_done = True
@@ -103,7 +103,7 @@ def to_go():
     '''
 	Checks whether the current position is within 15 meters range (at max).
     '''
-    if abs((x**2 + y**2)**0.5) < 15:
+    if abs((x**2 + y**2)**0.5) < 1.1:
 	linear_done = True
     else:
 	linear_done = False

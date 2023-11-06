@@ -154,8 +154,8 @@ if __name__ == '__main__':
 			'lift_up': 0,
 			'feeder' : 0,
 
-			'LT': 0,
-			'RT': 0,
+			'LT': 5,
+			'RT': 5,
 			'F_sp':0,
 			'F_amt':0
 		    }

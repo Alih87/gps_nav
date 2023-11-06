@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, datetime
-from sbg_driver.msg import SbgGpsPos
+from gps_nav.msg import latlon_gps
 from functools import partial
 
-logs_path = r"/home/scout/catkin_ws/src/gps_nav/logs/"
+logs_path = r"/home/pi/"
 COUNT = int(0)
 def get_coords(fl, data):
-    lat, long = data.latitude, data.longitude
+    lat, long = data.lat, data.lon
     fl.write(str(lat)+","+str(long)+"\n")
     global COUNT
     COUNT += 1
@@ -16,7 +16,7 @@ def get_coords(fl, data):
 def sbg_sub(fl):
     rospy.init_node('sample_gps')
     get_coords_func = partial(get_coords, fl)
-    rospy.Subscriber('/sbg/gps_pos', SbgGpsPos, get_coords_func)
+    rospy.Subscriber('gps_pos1', latlon_gps, get_coords_func)
     rospy.sleep(0.01)
 
 if __name__ == '__main__':

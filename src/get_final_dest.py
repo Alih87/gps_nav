@@ -5,6 +5,8 @@ from gps_nav.msg import coordinates, pose_xy, flag, table1
 #from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, pi
 
+CENTER = (388731.70, 3974424.49)
+
 def user_input(xin, yin, theta_in):
     global x, y, theta
     x = map(int, xin)
@@ -45,8 +47,8 @@ if __name__ == '__main__':
 	ls = [wp_1,wp_2,wp_3,wp_4]
 	for s in ls:
 		X, Y = s.split(',')
-		x.append(float(X))
-		y.append(float(Y))
+		x.append(float(X)-CENTER[0])
+		y.append(float(Y)-CENTER[1])
 		theta.append(float(0))
 	#user_input(easting, northing, heading)
 	try:
