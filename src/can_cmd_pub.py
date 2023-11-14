@@ -7,57 +7,61 @@ from gps_nav.can_send import serial_can
 from gps_nav.msg import can_pose, status, flag
 
 #flag = False
-called = False
 
-def finish_callback(data):
-	global cmd_dict, called
-	if data:
-		cmd_dict['RT'], cmd_dict['LT'] = 0, 0
+class cmd_pub_node(object):
+	def __init__(self, cmd_dict):
+		self.called = False
+		self.cmd_dict = cmd_dict
+		self.forward, self.measure, self.lift_up, self.feeder = 0, 0, 0, 0
+		self.LT, self.RT, self.F_sp, self.F_amt = 0, 0, 0, 0
 
-	called = True
 
-def get_can_pose(data):
-	global RT, LT, cmd_dict, called
-	RT, LT = data.rt, data.lt
-	if RT > LT:
-		cmd_dict['RT'], cmd_dict['LT'] = RT, 0
-	elif RT < LT:
-		cmd_dict['RT'], cmd_dict['LT'] = 0, LT
+	def finish_callback(self, data):
+		if data:
+			self.cmd_dict['RT'], self.cmd_dict['LT'] = 0, 0
 
-	called = True
+		self.called = True
 
-def can_pose_sub():
-	global called
-	rospy.init_node('cmd_node', anonymous=False)
-	rospy.Subscriber("cmd_vel", can_pose, get_can_pose)
+	def get_can_pose(self, data):
+		self.RT, self.LT = data.rt, data.lt
+		if self.RT > self.LT:
+			self.cmd_dict['RT'], self.cmd_dict['LT'] = self.RT, 0
+		elif self.RT < self.LT:
+			self.cmd_dict['RT'], self.cmd_dict['LT'] = 0, self.LT
 
-	if called:
-		called = False
-		return True
-	else:
-		return False
-	rospy.sleep(0.01)
+		self.called = True
 
-def finish_flag_sub():
-	global called
-	rospy.init_node('cmd_node', anonymous=False)
-	rospy.Subscriber("stopper", flag, finish_callback)
-	rospy.sleep(0.01)
-	
-	if called:
-		called = False
-		return True
-	else:
-		return False
+	def can_pose_sub(self):
+		rospy.init_node('cmd_node', anonymous=False)
+		rospy.Subscriber("cmd_vel", can_pose, self.get_can_pose)
+		rospy.sleep(0.01)
 
-def pub_status(cmd_dict):
-    rospy.init_node('cmd_node', anonymous=False)
-    pub = rospy.Publisher('boat_status', status, queue_size=10)
+		if self.called:
+			self.called = False
+			return True
+		else:
+			return False
 
-    engine, winch, stop, mode, forward, measure, lift_up, feeder, LT, RT, F_sp, F_amt = str(cmd_dict['engine']), str(cmd_dict['winch']), str(cmd_dict['stop']), str(cmd_dict['mode']), str(cmd_dict['forward']), str(cmd_dict['measure']), str(cmd_dict['lift_up']), str(cmd_dict['feeder']), str(cmd_dict['LT']), str(cmd_dict['RT']), str(cmd_dict['F_sp']), str(cmd_dict['F_amt'])
+	def finish_flag_sub(self):
+		rospy.init_node('cmd_node', anonymous=False)
+		rospy.Subscriber("stopper", flag, self.finish_callback)
+		rospy.sleep(0.01)
+		
+		if self.called:
+			self.called = False
+			return True
+		else:
+			return False
 
-    pub.publish(engine, winch, stop, mode, forward, measure, lift_up, feeder, LT, RT, F_sp, F_amt)
-    rospy.sleep(0.01)
+	def pub_status(self):
+		rospy.init_node('cmd_node', anonymous=False)
+		pub = rospy.Publisher('boat_status', status, queue_size=10)
+
+		engine, winch, stop, mode, forward, measure, lift_up, feeder, LT, RT, F_sp, F_amt = str(self.cmd_dict['engine']), str(self.cmd_dict['winch']), str(self.cmd_dict['stop']), str(self.cmd_dict['mode']),\
+																							str(self.cmd_dict['forward']), str(self.cmd_dict['measure']), str(self.cmd_dict['lift_up']), str(self.cmd_dict['feeder']),\
+																							str(self.cmd_dict['LT']), str(self.cmd_dict['RT']), str(self.cmd_dict['F_sp']), str(self.cmd_dict['F_amt'])
+		pub.publish(engine, winch, stop, mode, forward, measure, lift_up, feeder, LT, RT, F_sp, F_amt)
+		rospy.sleep(0.01)
 
 if __name__ == '__main__':
 	canbus = CAN_ISOBUS()
@@ -94,6 +98,7 @@ if __name__ == '__main__':
 			'F_amt': F_amt
 		    }
 
+	cmd_obj = cmd_pub_node(cmd_dict=cmd_dict)
 	for i in range(11):
 		try:
 			serial_port = serial.Serial(
@@ -103,11 +108,11 @@ if __name__ == '__main__':
 				parity=serial.PARITY_NONE,
 				stopbits=serial.STOPBITS_ONE)
 			slcan = serial_can(serial_port)
-			time.sleep(0.1)
+			#time.sleep(0.1)
 			while not rospy.is_shutdown():
-				pub_status(cmd_dict)
-				change = can_pose_sub()
-				change = finish_flag_sub()
+				cmd_obj.pub_status()
+				change = cmd_obj.can_pose_sub()
+				change = cmd_obj.finish_flag_sub()
 				cmd = str(canbus.set_cmd(cmd_dict)).encode()
 				#print(cmd)
 				slcan.send_rcv(cmd)
