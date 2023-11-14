@@ -96,6 +96,6 @@ def feedback_ctrl_msg():
     rospy.Subscriber("feedback", pose_xy, sub_ctrl_msg)
 
 if __name__ == '__main__':
-    while not rospy.is_shutdown():
-	boat_ctrl_command()
-        feedback_ctrl_msg()
+	while not rospy.is_shutdown():
+		boat_ctrl_command()
+		feedback_ctrl_msg()

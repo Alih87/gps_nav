@@ -6,12 +6,6 @@ from gps_nav.msg import coordinates, pose_xy, flag
 from math import atan, atan2, pi
 
 
-global theta_done, linear_done
-theta_done, linear_done = False, False
-curr_x, curr_y, curr_theta = 0, 0, 0
-dest_x, dest_y, dest_theta = 0, 0, 0
-x, y, theta = 0, 0, 0
-
 ############### USING SCOUT ODOMETER #####################
 def get_theta(q):
     siny_cosp = 2*(q.w*q.z + q.x*q.z)
@@ -49,83 +43,93 @@ def dist_to_go():
     rospy.sleep(0.01)
 
 ##########################################################
+class optimizer_node():
+	def __init__(self):
+		self.theta_done, self.linear_done = False, False
+		self.curr_x, self.curr_y, self.curr_theta = 0, 0, 0
+		self.dest_x, self.dest_y, self.dest_theta = 0, 0, 0
+		self.x, self.y, self.theta = 0, 0, 0
+		
+	def calculate_angle(self, y, x):
+		if x > 0:
+			return atan(y/x)*(180/pi)
+		if x == 0 and y > 0:
+			return (pi/2)*(180/pi)
+		if x == 0 and y < 0:
+			return (-pi/2)*(180/pi)
+		if x < 0 and y >= 0:
+			return (atan(y/x) + pi)*(180/pi)
+		if x < 0 and y < 0:
+			return (atan(y/x) - pi)*(180/pi)
 
-def calculate_angle(y, x):
-	if x > 0:
-		return atan(y/x)*(180/pi)
-	if x==0 and y > 0:
-		return (pi/2)*(180/pi)
-	if x==0 and y < 0:
-		return (-pi/2)*(180/pi)
-	if x < 0 and y >= 0:
-		return (atan(y/x) + pi)*(180/pi)
-	if x < 0 and y < 0:
-		return (atan(y/x) - pi)*(180/pi)
+	def calculate_angle2(self):
+		return atan2(self.y, self.x)*(180/pi)
 
-def calculate_angle2(y, x):
-		return atan2(y,x)*(180/pi)
+	def make_done_false(self):
+		self.theta_done, self.linear_done = False, False
 
-def make_done_false():
-	global theta_done, linear_done
-	theta_done, linear_done = False, False
-
-def update_done_flag(done=False):
-	rospy.init_node('optimizer', anonymous=False)
-	pub = rospy.Publisher('done_flag', flag, queue_size=10)
-	pub.publish(done)
-
-def get_dest_pose():
-    rospy.init_node('optimizer', anonymous=False)
-    rospy.Subscriber('final_pos', coordinates, get_dest_state)
-    rospy.sleep(0.01)
-
-def get_curr_pose():
-    rospy.init_node('optimizer', anonymous=False)
-    rospy.Subscriber('odom_pose', coordinates, get_state)
-    rospy.sleep(0.01)
-
-def to_go():
-    rospy.init_node('optimizer', anonymous=False)
-    pub = rospy.Publisher('feedback', pose_xy, queue_size=30)
-    global x, y, theta, theta_done, linear_done
-    x = dest_x - curr_x
-    y = dest_y - curr_y
-    theta = calculate_angle2(y, x) + curr_theta
-
-    '''
-	Checks whether the current angle is within the 90 degree (at max) arc.
-    '''
-    if theta - curr_theta < -10 or theta - curr_theta > 10:
-	theta_done = False
-    else:
-	theta_done = True
-
-    '''
-	Checks whether the current position is within 15 meters range (at max).
-    '''
-    if abs((x**2 + y**2)**0.5) < 1.1:
-	linear_done = True
-    else:
-	linear_done = False
+	def update_done_flag(self, done=False):
+		rospy.init_node('optimizer', anonymous=False)
+		pub = rospy.Publisher('done_flag', flag, queue_size=10)
+		pub.publish(done)
 	
-    '''
-	If both angular and linear position is within the required range, complete the path and move to the next destination points.
-    '''
-    if linear_done and theta_done:
-	theta_done, linear_done = False, False
-	update_done_flag(True)
-    else:
-	update_done_flag()
-    
-    pub.publish(x, y, theta, theta_done, linear_done)
-    rospy.sleep(0.01)
+	def get_dest_state(data):
+		self.dest_x, self.dest_y, self.dest_theta = data.x, data.y, data.theta
+
+	def get_state(data):
+		self.curr_x, self.curr_y, self.curr_theta = data.x, data.y, data.theta
+
+	def get_dest_pose(self):
+		rospy.init_node('optimizer', anonymous=False)
+		rospy.Subscriber('final_pos', coordinates, self.get_dest_state)
+		rospy.sleep(0.01)
+
+	def get_curr_pose(self):
+		rospy.init_node('optimizer', anonymous=False)
+		rospy.Subscriber('odom_pose', coordinates, self.get_state)
+		rospy.sleep(0.01)
+
+	def to_go(self):
+		rospy.init_node('optimizer', anonymous=False)
+		pub = rospy.Publisher('feedback', pose_xy, queue_size=30)
+		self.x = self.dest_x - self.curr_x
+		self.y = self.dest_y - self.curr_y
+		self.theta = calculate_angle2(self.y, self.x) + self.curr_theta
+
+		'''
+		Checks whether the current angle is within the 90 degree (at max) arc.
+		'''
+		if self.theta - self.curr_theta < -10 or self.theta - self.curr_theta > 10:
+			self.theta_done = False
+		else:
+			self.theta_done = True
+
+		'''
+		Checks whether the current position is within 15 meters range (at max).
+		'''
+		if abs((self.x**2 + self.y**2)**0.5) < 1.1:
+			self.linear_done = True
+		else:
+			self.linear_done = False
+
+		'''
+		If both angular and linear position is within the required range, complete the path and move to the next destination points.
+		'''
+		if self.linear_done and self.theta_done:
+			self.theta_done, self.linear_done = False, False
+			self.update_done_flag(True)
+		else:
+			self.update_done_flag()
+
+		pub.publish(self.x, self.y, self.theta, self.theta_done, self.linear_done)
+		rospy.sleep(0.01)
 
 if __name__ == '__main__':
-    print("[INFO] Initialized Optimization Node.")
-    while not rospy.is_shutdown():
-        get_curr_pose()
-        get_dest_pose()
-        to_go()
+	print("[INFO] Initialized Optimization Node.")
+	while not rospy.is_shutdown():
+		self.get_curr_pose()
+		self.get_dest_pose()
+		self.to_go()
 
 	#get_xy_pose()
         #get_dest_xy_pose()

@@ -29,7 +29,7 @@ def get_can_pose(data):
 def can_pose_sub():
 	global called
 	rospy.init_node('cmd_node', anonymous=False)
-    	rospy.Subscriber("cmd_vel", can_pose, get_can_pose)
+	rospy.Subscriber("cmd_vel", can_pose, get_can_pose)
 
 	if called:
 		called = False

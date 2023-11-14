@@ -25,8 +25,8 @@ if __name__ == '__main__':
 	optim_sub()
 	rate = rospy.Rate(1)
 	while not rospy.is_shutdown():
-	    optim_sub()
-	    rate.sleep()
+		optim_sub()
+		rate.sleep()
 
 	with open(logs_path + "NAV_LOG_"+dt+".txt", "w") as f:
 		for line in CONTENT:
