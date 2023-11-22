@@ -1,7 +1,7 @@
 <launch>
 
-<param name="robot_description" textfile="$(find gps_nav)/urdf/vehicle.xacro"/>
-<param name="boat" command="$(find xacro)/xacro --inorder '$(find gps_nav)/urdf/vehicle.xacro'"/>
+<param name="robot_description" command="xacro '$(find gps_nav)/urdf/vehicle.urdf.xacro'"/>
+<param name="boat" command="$(find xacro)/xacro --inorder '$(find gps_nav)/urdf/vehicle.urdf.xacro'"/>
 
 <node pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" name="rob_joint_gui"/>
 <node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_boat"/>
