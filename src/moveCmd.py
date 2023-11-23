@@ -4,98 +4,98 @@ import rospy
 import sys
 from gps_nav.msg import can_pose
 from gps_nav.msg import pose_xy
+from geometry_msgs.msg import Twist
 
-TOP_LINEAR_SPEED = 10
-TOP_ANGULAR_SPEED = 10
-linear_spd = 10
-angular_spd = 10
-flag_grt, flag_sml = False, False
-
-x_est, y_est, theta_est, theta_done, linear_done = 0, 0, 0, False, False
 # x_dest, y_dest, theta_dest = 0, 0, 0
 
-def regulate(linear_spd, angular_spd):
-    global TOP_LINEAR_SPEED, TOP_ANGULAR_SPEED
-    if linear_spd > TOP_LINEAR_SPEED:
-        print("[ INFO] Fixing Linear Speed ...")
-        linear_spd = TOP_LINEAR_SPEED
-    if angular_spd > TOP_ANGULAR_SPEED:
-        print("[ INFO] Fixing Angular Speed ...")
-        angular_spd = TOP_ANGULAR_SPEED
+class move_node(object):
+	def __init__(self):
+		self.TOP_LINEAR_SPEED = 10
+		self.TOP_ANGULAR_SPEED = 10
+		self.linear_spd = 10
+		self.angular_spd = 10
+		self.flag_grt, self.flag_sml = False, False
+		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = 0, 0, 0, False, False
 
-    return linear_spd, angular_spd
+	def regulate(self, linear_spd, angular_spd):
+		if self.linear_spd > self.TOP_LINEAR_SPEED:
+			print("[ INFO] Fixing Linear Speed ...")
+			self.linear_spd = self.TOP_LINEAR_SPEED
+		if self.angular_spd > self.TOP_ANGULAR_SPEED:
+			print("[ INFO] Fixing Angular Speed ...")
+			self.angular_spd = self.TOP_ANGULAR_SPEED
 
-def pub_ctrl_command():
-    rospy.init_node('boat_ctrl', anonymous=False)
-    pub = rospy.Publisher('/cmd_vel', Twist, queue_size=30)
+		return self.linear_spd, self.angular_spd
 
-    global linear_spd, angular_spd
+	def pub_ctrl_command(self):
+		rospy.init_node('boat_ctrl', anonymous=False)
+		pub = rospy.Publisher('/cmd_vel', Twist, queue_size=30)
 
-    linear_spd, angular_spd = regulate(linear_spd, angular_spd)
+		self.linear_spd, self.angular_spd = self.regulate(self.linear_spd, self.angular_spd)
 
-    hyp = (x_est**2 + y_est**2)**0.5
-    if int(theta_est) is not 0 and hyp > 0.1:
-        rt, lt = angular_spd, -angular_spd
+		hyp = (self.x_est**2 + self.y_est**2)**0.5
+		if int(self.theta_est) is not 0 and hyp > 0.1:
+			rt, lt = self.angular_spd, -self.angular_spd
 
-    elif theta_est > 0 or theta_est < 0 or hyp > 0.1:
-        rt, lt = linear_spd, linear_spd 
-    
-    else:
-        rt, lt = 0, 0
-
-    pub.publish(rt, lt)
-
-def boat_ctrl_command():
-	rospy.init_node('boat_ctrl', anonymous=False)
-	pub = rospy.Publisher('cmd_vel', can_pose, queue_size=30)
-
-	#hyp = (x_est**2 + y_est**2)**0.5
-	global linear_spd, angular_spd, flag_grt, flag_sml
-
-	linear_spd, angular_spd = regulate(linear_spd, angular_spd)
-
-	hyp = (x_est**2 + y_est**2)**0.5
-	if not theta_done and not linear_done:
-		if theta_est == 0:
+		elif self.theta_est > 0 or self.theta_est < 0 or hyp > 0.1:
+			rt, lt = self.linear_spd, self.linear_spd 
+		
+		else:
 			rt, lt = 0, 0
-			pass
 
-		elif theta_est/abs(theta_est) > 0:
-			if not flag_grt:
-				for _ in range(4):
-					rt, lt = 0, 0
-				flag_grt = True
-				flag_sml = False
-				rospy.sleep(1)
-			rt, lt = angular_spd, -angular_spd
+		pub.publish(rt, lt)
 
-		elif theta_est/abs(theta_est) < 0:
-			if not flag_sml:
-				for _ in range(4):
-					rt, lt = 0, 0
-				flag_grt = False
-				flag_sml = True
-				rospy.sleep(1)
-			rt, lt = -angular_spd, angular_spd
+	def boat_ctrl_command(self):
+		rospy.init_node('boat_ctrl', anonymous=False)
+		pub = rospy.Publisher('cmd_vel', can_pose, queue_size=30)
 
-	elif theta_done and not linear_done:
-		rt, lt = linear_spd, linear_spd
+		#hyp = (x_est**2 + y_est**2)**0.5
 
-	else:
-		rt, lt = 0, 0
+		self.linear_spd, self.angular_spd = self.regulate(self.linear_spd, self.angular_spd)
 
-	pub.publish(rt, lt)
+		hyp = (self.x_est**2 + self.y_est**2)**0.5
+		if not self.theta_done and not self.linear_done:
+			if self.theta_est == 0:
+				rt, lt = 0, 0
+				pass
 
-def sub_ctrl_msg(data):
-    global x_est, y_est, theta_est, theta_done, linear_done
-    x_est, y_est, theta_est, theta_done, linear_done = data.x, data.y, data.theta, data.theta_done, data.linear_done
+			elif self.theta_est/abs(self.theta_est) > 0:
+				if not flag_grt:
+					for _ in range(4):
+						rt, lt = 0, 0
+					flag_grt = True
+					flag_sml = False
+					rospy.sleep(1)
+				rt, lt = self.angular_spd, -self.angular_spd
+
+			elif self.theta_est/abs(self.theta_est) < 0:
+				if not flag_sml:
+					for _ in range(4):
+						rt, lt = 0, 0
+					flag_grt = False
+					flag_sml = True
+					rospy.sleep(1)
+				rt, lt = -self.angular_spd, self.angular_spd
+
+		elif self.theta_done and not self.linear_done:
+			rt, lt = self.linear_spd, self.linear_spd
+
+		else:
+			rt, lt = 0, 0
+
+		pub.publish(rt, lt)
+
+	def sub_ctrl_msg(self, data):
+		global x_est, y_est, theta_est, theta_done, linear_done
+		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = data.x, data.y, data.theta, data.theta_done, data.linear_done
 
 
-def feedback_ctrl_msg():
-    rospy.init_node('boat_ctrl', anonymous=False)
-    rospy.Subscriber("feedback", pose_xy, sub_ctrl_msg)
+	def feedback_ctrl_msg(self):
+		rospy.init_node('boat_ctrl', anonymous=False)
+		rospy.Subscriber("feedback", pose_xy, self.sub_ctrl_msg)
 
 if __name__ == '__main__':
+	move_obj = move_node()
 	while not rospy.is_shutdown():
-		boat_ctrl_command()
-		feedback_ctrl_msg()
+		move_node.boat_ctrl_command()
+		move_node.feedback_ctrl_msg()
