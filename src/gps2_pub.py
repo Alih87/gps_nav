@@ -46,7 +46,7 @@ if __name__ == '__main__':
 				parity=serial.PARITY_NONE,
 				stopbits=serial.STOPBITS_ONE
 						   )
-			time.sleep(1)
+			#time.sleep(1)
 			if not serial_port.isOpen():
 				pass
 			else:

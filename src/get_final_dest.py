@@ -5,12 +5,11 @@ from gps_nav.msg import coordinates, pose_xy, flag, table1
 #from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, pi
 
-class get_final_dests():
-	def __init__(self, wp_ls):
-		self.idx = 0
-		self.x, self.y, self.theta = [],[],[]
+class get_final_dests(object):
+	def __init__(self, x, y, theta, wp_ls, idx):
+		self.x, self.y, self.theta = x, y, theta
 		self.wp_ls = wp_ls
-		
+		self.idx = idx
 	
 	def user_input(self, xin, yin, theta_in):
 		self.x = map(int, xin)
@@ -23,15 +22,15 @@ class get_final_dests():
 		else:
 			pass
 		
-	def publish_curr_final_pos(self, x, y, theta):
+	def publish_curr_final_pos(self, idx):
 		rospy.init_node("current_final_pos", anonymous=False)
 		pub = rospy.Publisher("final_pos", coordinates, queue_size=10)
-		pub.publish(x[self.idx], y[self.idx], theta[self.idx])
+		pub.publish(self.x[idx], self.y[idx], self.theta[idx])
 
 	def publish_dest_wp(self):
 		rospy.init_node("current_final_pos", anonymous=False)
 		pub = rospy.Publisher("wp_table1", table1, queue_size=10)
-		pub.publish(wp_ls[0], wp_ls[1], wp_ls[2], wp_ls[3])
+		pub.publish(self.wp_ls[0], self.wp_ls[1], self.wp_ls[2], self.wp_ls[3])
 
 	def complete_flag_sub(self):
 		rospy.init_node('current_final_pos', anonymous=False)
@@ -45,8 +44,8 @@ if __name__ == '__main__':
 	wp_4 = rospy.get_param("/dest_pos_pub/wp_4")
 
 	CENTER = (388731.70, 3974424.49)
-
 	ls = [wp_1, wp_2, wp_3, wp_4]
+	x, y, theta = [], [], []
 	for s in ls:
 		X, Y = s.split(',')
 		x.append(float(X)-CENTER[0])
@@ -60,15 +59,14 @@ if __name__ == '__main__':
 		print("[INFO] Assertion Failed. Check number of destination TM coordinates.")
 		while(True):
 			pass
-	
-	dests_obj = get_final_dests(ls)
-
+	idx = 0
+	dests_obj = get_final_dests(x, y, theta, ls, idx)
 	print("\n[ INFO] Publishing destination information ...\n")
 	while not rospy.is_shutdown():
-		if idx < len(ls):
-			self.publish_curr_final_pos(x, y, theta, idx)
-			self.publish_dest_wp()
-			self.complete_flag_sub()
+		if dests_obj.idx < len(ls):
+			dests_obj.publish_curr_final_pos(x, y, theta, ls)
+			dests_obj.publish_dest_wp()
+			dests_obj.complete_flag_sub()
 		else:
 			break
 		#if idx >= len(x):
