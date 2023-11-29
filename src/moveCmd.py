@@ -60,19 +60,19 @@ class move_node(object):
 				pass
 
 			elif self.theta_est/abs(self.theta_est) > 0:
-				if not flag_grt:
+				if not self.flag_grt:
 					for _ in range(4):
 						rt, lt = 0, 0
-					flag_grt = True
-					flag_sml = False
+					self.flag_grt = True
+					self.flag_sml = False
 					rospy.sleep(1)
 				rt, lt = self.angular_spd, -self.angular_spd
 
 			elif self.theta_est/abs(self.theta_est) < 0:
-				if not flag_sml:
+				if not self.flag_sml:
 					for _ in range(4):
 						rt, lt = 0, 0
-					flag_grt = False
+					self.flag_grt = False
 					flag_sml = True
 					rospy.sleep(1)
 				rt, lt = -self.angular_spd, self.angular_spd
