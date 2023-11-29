@@ -27,7 +27,7 @@ class GPS(object):
 				if self.port.inWaiting() > 0:
 					wait_idx = 0
 					self.buf += self.port.read()
-					#print(self.buf)
+					print(self.buf)
 					if self.has_head and "\r".encode() in self.buf:
 						self.msgs.append(self.buf[:-1])
 						self.buf = "".encode()
@@ -51,7 +51,7 @@ class GPS(object):
 
 				else:
 					wait_idx += 1
-					if wait_idx == 500000:
+					if wait_idx == 600000:
 						wait_idx = 0
 						break
 				

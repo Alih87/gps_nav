@@ -4,36 +4,36 @@ import rospy, serial, sys
 from gps_nav.msg import latlon_gps, heading_ang
 from gps_nav.gps_device import GPS
 
-X, Y, PORT = 0, 0, 0
+class gps2_node(object):
+	def __init__(self):
+		self.X, self.Y, self.PORT = 0, 0, 0
+	def loc_pub(self, x, y):
+		rospy.init_node('dgps2', anonymous=False)
+		pub = rospy.Publisher('gps_pos2', latlon_gps, queue_size=10)
+		try:
+			X, Y = float(x)/100.0, float(y)/100.0
+		except:
+			X, Y = 0, 0
+		pub.publish(X,Y)
+		rospy.sleep(0.01)
 
-def loc_pub(x, y):
-	global X, Y
-	rospy.init_node('dgps2', anonymous=False)
-	pub = rospy.Publisher('gps_pos2', latlon_gps, queue_size=10)
-	try:
-		X, Y = float(x)/100.0, float(y)/100.0
-	except:
-		X, Y = 0, 0
-	pub.publish(X,Y)
-	rospy.sleep(0.01)
+	def port_callback(self, data):
+		if data.angle is not None:
+			self.PORT = int(data.angle)
 
-def port_callback(data):
-	global PORT
-	if data.angle is not None:
-		PORT = int(data.angle)
-
-def sub_port_num():
-	rospy.init_node('dgps2', anonymous=False)
-	rospy.Subscriber('port_num', heading_ang, port_callback)
-	rospy.sleep(0.01)
+	def sub_port_num(self):
+		rospy.init_node('dgps2', anonymous=False)
+		rospy.Subscriber('port_num', heading_ang, self.port_callback)
+		rospy.sleep(0.01)
 
 
 if __name__ == '__main__':
+	gps2_obj = gps2_node()
 	for _ in range(10):
-		sub_port_num()
-
+		gps2_obj.sub_port_num()
+	sys.stdout.write(str(gps2_obj.PORT))
 	for i in range(10):
-		if i == PORT:
+		if i == int(gps2_obj.PORT):
 			continue
 		if i == 9:
 			sys.stdout.write("\n[INFO] No Port found!\n")
@@ -60,8 +60,8 @@ if __name__ == '__main__':
 				frame = gps.parse()
 				if len(list(frame.keys())) == 0:
 					break
-				sub_port_num()
-				loc_pub(frame['dir_lat'], frame['dir_lon'])
+				#sub_port_num()
+				gps2_obj.loc_pub(frame['dir_lat'], frame['dir_lon'])
 
 			
 		except:
