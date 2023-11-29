@@ -62,8 +62,8 @@ class optimizer_node():
 		if x < 0 and y < 0:
 			return (atan(y/x) - pi)*(180/pi)
 
-	def calculate_angle2(self):
-		return atan2(self.y, self.x)*(180/pi)
+	def calculate_angle2(self, x, y):
+		return atan2(y, x)*(180/pi)
 
 	def make_done_false(self):
 		self.theta_done, self.linear_done = False, False
@@ -73,10 +73,10 @@ class optimizer_node():
 		pub = rospy.Publisher('done_flag', flag, queue_size=10)
 		pub.publish(done)
 	
-	def get_dest_state(data):
+	def get_dest_state(self, data):
 		self.dest_x, self.dest_y, self.dest_theta = data.x, data.y, data.theta
 
-	def get_state(data):
+	def get_state(self, data):
 		self.curr_x, self.curr_y, self.curr_theta = data.x, data.y, data.theta
 
 	def get_dest_pose(self):
@@ -94,7 +94,7 @@ class optimizer_node():
 		pub = rospy.Publisher('feedback', pose_xy, queue_size=30)
 		self.x = self.dest_x - self.curr_x
 		self.y = self.dest_y - self.curr_y
-		self.theta = calculate_angle2(self.y, self.x) + self.curr_theta
+		self.theta = self.calculate_angle2(self.y, self.x) + self.curr_theta
 
 		'''
 		Checks whether the current angle is within the 90 degree (at max) arc.
@@ -125,11 +125,12 @@ class optimizer_node():
 		rospy.sleep(0.01)
 
 if __name__ == '__main__':
+	optim_obj = optimizer_node()
 	print("[INFO] Initialized Optimization Node.")
 	while not rospy.is_shutdown():
-		self.get_curr_pose()
-		self.get_dest_pose()
-		self.to_go()
+		optim_obj.get_curr_pose()
+		optim_obj.get_dest_pose()
+		optim_obj.to_go()
 
 	#get_xy_pose()
         #get_dest_xy_pose()

@@ -97,5 +97,5 @@ class move_node(object):
 if __name__ == '__main__':
 	move_obj = move_node()
 	while not rospy.is_shutdown():
-		move_node.boat_ctrl_command()
-		move_node.feedback_ctrl_msg()
+		move_obj.boat_ctrl_command()
+		move_obj.feedback_ctrl_msg()

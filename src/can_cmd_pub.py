@@ -115,7 +115,7 @@ if __name__ == '__main__':
 				change = cmd_obj.finish_flag_sub()
 				cmd = str(canbus.set_cmd(cmd_dict)).encode()
 				#print(cmd)
-				slcan.send_rcv(cmd)
+				#slcan.send_rcv(cmd)
 				slcan.get_status()
 			print("[INFO] Connected on port "+str(i))
 			#break

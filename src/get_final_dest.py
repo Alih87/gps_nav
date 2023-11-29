@@ -22,10 +22,10 @@ class get_final_dests(object):
 		else:
 			pass
 		
-	def publish_curr_final_pos(self, idx):
+	def publish_curr_final_pos(self):
 		rospy.init_node("current_final_pos", anonymous=False)
 		pub = rospy.Publisher("final_pos", coordinates, queue_size=10)
-		pub.publish(self.x[idx], self.y[idx], self.theta[idx])
+		pub.publish(self.x[self.idx], self.y[self.idx], self.theta[self.idx])
 
 	def publish_dest_wp(self):
 		rospy.init_node("current_final_pos", anonymous=False)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 	print("\n[ INFO] Publishing destination information ...\n")
 	while not rospy.is_shutdown():
 		if dests_obj.idx < len(ls):
-			dests_obj.publish_curr_final_pos(x, y, theta, ls)
+			dests_obj.publish_curr_final_pos()
 			dests_obj.publish_dest_wp()
 			dests_obj.complete_flag_sub()
 		else:
