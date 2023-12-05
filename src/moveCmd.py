@@ -42,30 +42,31 @@ class move_node(object):
 				T.linear.z = 0
 				T.angular.z = 0
 
-			elif self.theta_est/abs(self.theta_est) > 0:
-				T.linear.x = self.linear_spd
+			elif (self.theta_est/abs(self.theta_est)) > 0:
+				T.linear.x = 0
 				T.linear.y = 0
 				T.linear.z = 0
-				T.angular.z = self.angular_spd
+				T.angular.z = -1*self.angular_spd
 
-			elif self.theta_est/abs(self.theta_est) < 0:
+			elif (self.theta_est/abs(self.theta_est)) < 0:
 				T.linear.x = 0
 				T.linear.y = 0
 				T.linear.z = 0
 				T.angular.z = self.angular_spd
 
 		elif self.theta_done and not self.linear_done:
-			pass
+			T.linear.x = self.linear_spd
+			T.linear.y = 0
+			T.linear.z = 0
+			T.angular.z = 0
 
 		else:
 			pass
 
-		pub.publish(rt, lt)
+		pub.publish(T)
 
 	def sub_ctrl_msg(self, data):
-		global x_est, y_est, theta_est, theta_done, linear_done
 		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = data.x, data.y, data.theta, data.theta_done, data.linear_done
-
 
 	def feedback_ctrl_msg(self):
 		rospy.init_node('scout_ctrl', anonymous=False)
