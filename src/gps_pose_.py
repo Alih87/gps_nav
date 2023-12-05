@@ -36,43 +36,11 @@ class gps_pose_node(object):
         rospy.init_node('gps_pose', anonymous=False)
         rospy.Subscriber('dgps_heading', heading_ang, self.get_heading)
 
-
     def utm_pub(self):
         rospy.init_node('gps_pose', anonymous=False)
         pub = rospy.Publisher('odom_pose', coordinates, queue_size=10)
         pub.publish(self.X,self.Y,self.HEADING)
         rospy.sleep(0.01)
-
-############### USING SCOUT ODOMETER ##################
-
-def get_theta(q):
-    siny_cosp = 2*(q.w*q.z + q.x*q.z)
-    cosy_cosp = 1 - 2*(q.y*q.y + q.z*q.z)
-
-    return atan2(siny_cosp, cosy_cosp)*(180/pi)
-
-def get_state(data):
-    pos = data.pose.pose.position
-    quat = data.pose.pose.orientation
-    global X, Y, HEADING
-    X, Y = pos.x, pos.y
-    HEADING = get_theta(quat)
-
-    # print("Position : ", X, Y)
-    # print("Angle : ", HEADING)
-
-def odom_pub():
-    rospy.init_node('gps_pose', anonymous=False)
-    pub = rospy.Publisher('odom_pose', pose_xy, queue_size=30)
-    pub.publish(X,Y,HEADING)
-    rospy.sleep(0.01)
-
-def odom_sub():
-    rospy.init_node('gps_pose', anonymous=False)
-    rospy.Subscriber('/odom', Odometry, get_state)
-    rospy.sleep(0.01)
-
-#######################################################
 
 if __name__== '__main__':
     gps_pose_obj = gps_pose_node()

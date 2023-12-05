@@ -31,7 +31,7 @@ if __name__ == '__main__':
 	gps2_obj = gps2_node()
 	for _ in range(10):
 		gps2_obj.sub_port_num()
-	sys.stdout.write(str(gps2_obj.PORT))
+	#sys.stdout.write(str(gps2_obj.PORT))
 	for i in range(10):
 		if i == int(gps2_obj.PORT):
 			continue

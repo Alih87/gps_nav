@@ -24,14 +24,16 @@
         <arg name="model_xacro" default="$(arg model_xacro)" />
     </include-->
     
-    <node name="current_gps_pub" pkg="gps_nav" type="gps_pub.py"/>
-    <node name="current_heading_pub" pkg="gps_nav" type="heading_pub.py"/>
+    <node name="gps1_pub" pkg="gps_nav" type="gps1_pub.py"/>
+    <node name="gps2_pub" pkg="gps_nav" type="gps2_pub.py"/>
+    <node name="current_heading_pub" pkg="gps_nav" type="dual_heading_pub.py"/>
     <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_.py"/>
     
     <node name="dest_pos_pub" pkg="gps_nav" type="get_final_dest.py">
-    	<param name="easting" value="$(arg easting)"/>
-	<param name="northing" value="$(arg northing)"/>
-	<param name="heading" value="$(arg heading)"/>
+    	<param name="wp_1" value="$(arg wp_1)"/>
+	<param name="wp_2" value="$(arg wp_2)"/>
+	<param name="wp_3" value="$(arg wp_3)"/>
+	<param name="wp_4" value="$(arg wp_4)"/>
     </node>
 
     <node name="optimizer_node" pkg="gps_nav" type="optimizer.py"/>
