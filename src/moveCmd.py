@@ -10,10 +10,10 @@ from geometry_msgs.msg import Twist
 
 class move_node(object):
 	def __init__(self):
-		self.TOP_LINEAR_SPEED = 10
-		self.TOP_ANGULAR_SPEED = 10
-		self.linear_spd = 10
-		self.angular_spd = 10
+		self.TOP_LINEAR_SPEED = 0.15
+		self.TOP_ANGULAR_SPEED = 0.15
+		self.linear_spd = 0.11
+		self.angular_spd = 0.11
 		#self.flag_grt, self.flag_sml = False, False
 		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = 0, 0, 0, False, False
 
@@ -28,21 +28,31 @@ class move_node(object):
 		return self.linear_spd, self.angular_spd
 
 	def scout_ctrl_command(self):
+		T = Twist()
 		rospy.init_node('scout_ctrl', anonymous=False)
-		pub = rospy.Publisher('cmd_vel', can_pose, queue_size=30)
+		pub = rospy.Publisher('cmd_vel', Twist, queue_size=30)
 
 		self.linear_spd, self.angular_spd = self.regulate(self.linear_spd, self.angular_spd)
 
 		hyp = (self.x_est**2 + self.y_est**2)**0.5
 		if not self.theta_done and not self.linear_done:
 			if self.theta_est == 0
-				pass
+				T.linear.x = 0
+				T.linear.y = 0
+				T.linear.z = 0
+				T.angular.z = 0
 
 			elif self.theta_est/abs(self.theta_est) > 0:
-				pass
+				T.linear.x = self.linear_spd
+				T.linear.y = 0
+				T.linear.z = 0
+				T.angular.z = self.angular_spd
 
 			elif self.theta_est/abs(self.theta_est) < 0:
-				pass
+				T.linear.x = 0
+				T.linear.y = 0
+				T.linear.z = 0
+				T.angular.z = self.angular_spd
 
 		elif self.theta_done and not self.linear_done:
 			pass

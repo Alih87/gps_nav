@@ -37,8 +37,10 @@ class dual_heading_node(object):
 
 		#except OutOfRangeError:
 		#	pass
-
-		theta = atan2(vec[1], vec[0])*(180/pi)
+		try:
+			theta = atan2(vec[1], vec[0])*(180/pi)
+		except:
+			theta = self.ANGLE
 		if type(theta) is not None:
 			self.ANGLE = theta
 		#print(theta)

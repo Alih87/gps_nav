@@ -94,12 +94,12 @@ class optimizer_node():
 		pub = rospy.Publisher('feedback', pose_xy, queue_size=30)
 		self.x = self.dest_x - self.curr_x
 		self.y = self.dest_y - self.curr_y
-		self.theta = self.calculate_angle2(self.y, self.x) + self.curr_theta
+		self.theta = self.calculate_angle2(self.y, self.x) - self.curr_theta
 
 		'''
 		Checks whether the current angle is within the 90 degree (at max) arc.
 		'''
-		if self.theta - self.curr_theta < -10 or self.theta - self.curr_theta > 10:
+		if self.theta - self.curr_theta < -5 or self.theta - self.curr_theta > 5:
 			self.theta_done = False
 		else:
 			self.theta_done = True
@@ -107,7 +107,7 @@ class optimizer_node():
 		'''
 		Checks whether the current position is within 15 meters range (at max).
 		'''
-		if abs((self.x**2 + self.y**2)**0.5) < 1.1:
+		if abs((self.x**2 + self.y**2)**0.5) < 0.25:
 			self.linear_done = True
 		else:
 			self.linear_done = False
