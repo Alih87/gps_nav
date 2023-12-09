@@ -1,0 +1,3 @@
+<launch>
+    <node name="gps_scout_base" pkg="gps_nav" type="gps_scout_node.py"/>
+</launch>
