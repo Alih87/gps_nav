@@ -25,33 +25,29 @@ class gps1_node(object):
 
 if __name__ == '__main__':
 	gps1_obj = gps1_node()
-	for i in range(10):
-		if i == 9:
-			sys.stdout.write("\n[INFO] No Port found!\n")
-			break
-		try:
-			serial_port = serial.Serial(
-				port="/dev/ttyUSB0",
-				baudrate=115200,
-				bytesize=serial.EIGHTBITS,
-				parity=serial.PARITY_NONE,
-				stopbits=serial.STOPBITS_ONE
-						   )
-			#time.sleep(1)
-			if not serial_port.isOpen():
-				pass
-			else:
-				gps = GPS(serial_port)
-				sys.stdout.write("\n[INFO] Connection established at port USB0"+"\n")
-
-			while not rospy.is_shutdown():
-				ret = gps.read()
-				#if ret:
-				#	break
-				frame = gps.parse()
-				gps1_obj.pub_port_num(i)
-				gps1_obj.loc_pub(frame['dir_lat'], frame['dir_lon'])
-
-		except:
+	rospy.sleep(1)
+	try:
+		serial_port = serial.Serial(
+			port="/dev/ttyUSB0",
+			baudrate=115200,
+			bytesize=serial.EIGHTBITS,
+			parity=serial.PARITY_NONE,
+			stopbits=serial.STOPBITS_ONE
+					   )
+		if not serial_port.isOpen():
 			pass
+		else:
+			gps = GPS(serial_port)
+			sys.stdout.write("\n[INFO] Connection established at port USB0"+"\n")
+
+		while not rospy.is_shutdown():
+			ret = gps.read()
+			frame = gps.parse()
+			if len(list(frame.keys())) == 0:
+				break
+			gps1_obj.pub_port_num(0)
+			gps1_obj.loc_pub(frame['dir_lat'], frame['dir_lon'])
+
+	except:
+		sys.stdout.write("[INFO] GPS1 initialization failed. Restart the System.\n")
 

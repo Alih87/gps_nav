@@ -51,7 +51,7 @@ class GPS(object):
 
 				else:
 					wait_idx += 1
-					if wait_idx == 600000:
+					if wait_idx == 200000000:
 						wait_idx = 0
 						break
 				

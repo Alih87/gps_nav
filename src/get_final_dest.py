@@ -2,7 +2,6 @@
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
 from gps_nav.msg import coordinates, pose_xy, flag, table1
-#from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, pi
 
 class get_final_dests(object):
@@ -51,7 +50,6 @@ if __name__ == '__main__':
 		x.append(float(X)-CENTER[0])
 		y.append(float(Y)-CENTER[1])
 		theta.append(float(0))
-	#user_input(easting, northing, heading)
 	
 	try:
 		assert len(x) == len(y) and len(y) == len(theta) and len(x) == len(theta)
