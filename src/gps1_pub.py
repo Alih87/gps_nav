@@ -31,7 +31,7 @@ if __name__ == '__main__':
 			break
 		try:
 			serial_port = serial.Serial(
-				port="/dev/ttyUSB"+str(i),
+				port="/dev/ttyUSB0",
 				baudrate=115200,
 				bytesize=serial.EIGHTBITS,
 				parity=serial.PARITY_NONE,
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 				pass
 			else:
 				gps = GPS(serial_port)
-				sys.stdout.write("\n[INFO] Connection established at port USB"+str(i)+"\n")
+				sys.stdout.write("\n[INFO] Connection established at port USB0"+"\n")
 
 			while not rospy.is_shutdown():
 				ret = gps.read()

@@ -36,7 +36,7 @@ class move_node(object):
 
 		hyp = (self.x_est**2 + self.y_est**2)**0.5
 		if not self.theta_done and not self.linear_done:
-			if self.theta_est == 0
+			if self.theta_est == 0:
 				T.linear.x = 0
 				T.linear.y = 0
 				T.linear.z = 0

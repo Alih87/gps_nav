@@ -1,15 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, datetime
 import os
-from gps_nav.msg import pose_xy
+from gps_nav.msg import coordinates
 #from functools import partial
 
 logs_path = os.environ.get('HOME')+r"/boat_data/"
 
 class logger_node(object):
-	def __init__(self, content):
-		self.content = content
+	def __init__(self):
+		self.content = []
 
 	def log_data(self, data):
 		x, y, theta = data.x, data.y, data.theta
@@ -18,7 +18,7 @@ class logger_node(object):
 	def optim_sub(self):
 		rospy.init_node('data_logger')
 		#get_logger_func = partial(log_data, fl)
-		rospy.Subscriber('feedback', pose_xy, self.log_data)
+		rospy.Subscriber('odom_pose', coordinates, self.log_data)
 		rospy.sleep(0.01)
 
 if __name__ == '__main__':
