@@ -10,7 +10,7 @@ from math import atan, atan2, pi
 # HEADING = deque(maxlen=5)
 class gps_pose_node(object):
     def __init__(self):
-        self.CENTER = (388731.70, 3974424.49)
+        #self.CENTER = (388731.70, 3974424.49)
         self.ZONE = ''
         self.X = 0
         self.Y = 0
@@ -19,9 +19,9 @@ class gps_pose_node(object):
     def get_utm(self, data):
         lat, long = data.lat, data.lon
         self.X, self.Y, zo, ne = from_latlon(lat, long)
-        self.X, self.Y = self.X - self.CENTER[0], self.Y - self.CENTER[1]
-        self.X, self.Y = self.X, self.Y
-        # ZONE = str(zo)+ne
+        #self.X, self.Y = self.X - self.CENTER[0], self.Y - self.CENTER[1]
+        #self.X, self.Y = self.X, self.Y
+        #ZONE = str(zo)+ne
 
     def get_heading(self, data):
         angle = data.angle

@@ -3,7 +3,7 @@ import os, sys
 import  numpy as np
 import matplotlib.pyplot as plt
 
-DATA_PATH = r"/home/pi/boat_data/NAV_LOG_2023_12_07_00_28:40.txt"
+DATA_PATH = r"/home/pi/boat_data/Documents/NAV_LOG_2023_12_10_02_02:58.txt"
 
 fls = os.listdir(DATA_PATH)
 files = []
@@ -18,7 +18,7 @@ with open(DATA_PATH) as f:
 		y_l.append(float(y))	
 		theta_l.append(float(theta))
 
-print(x_l[:5],  y_l[:5])
+#print(x_l[:5],  y_l[:5])
 plt.plot(x_l, y_l[:len(x_l)])
 plt.xlabel("Easting")
 plt.ylabel("Northing")

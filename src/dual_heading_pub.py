@@ -25,8 +25,8 @@ class dual_heading_node(object):
 				DGPS2_m = from_latlon(self.DGPS2[0], self.DGPS2[1])
 				self.DGPS1u[0], self.DGPS1u[1] = DGPS1_m[0], DGPS1_m[1]
 				self.DGPS2u[0], self.DGPS2u[1] = DGPS2_m[0], DGPS2_m[1]
-				#DGPS1u[0], DGPS1u[1] = CENTER[0] - DGPS1u[0], CENTER[1] - DGPS1u[1]
-				#DGPS2u[0], DGPS2u[1] = CENTER[0] - DGPS2u[0], CENTER[1] - DGPS2u[1]
+				self.DGPS1u[0], self.DGPS1u[1] = self.CENTER[0] - self.DGPS1u[0], self.CENTER[1] - self.DGPS1u[1]
+				self.DGPS2u[0], self.DGPS2u[1] = self.CENTER[0] - self.DGPS2u[0], self.CENTER[1] - self.DGPS2u[1]
 				vec = (self.DGPS2u[0] - self.DGPS1u[0], self.DGPS2u[1] - self.DGPS1u[1])
 				#abs_vec = (vec[0]**2 + vec[1]**2)**0.5
 				#unit_vec = (vec[0]/abs_vec, vec[1]/abs_vec)

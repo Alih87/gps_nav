@@ -42,13 +42,13 @@ if __name__ == '__main__':
 	wp_3 = rospy.get_param("/dest_pos_pub/wp_3")
 	wp_4 = rospy.get_param("/dest_pos_pub/wp_4")
 
-	CENTER = (388731.70, 3974424.49)
+	#CENTER = (388731.70, 3974424.49)
 	ls = [wp_1, wp_2, wp_3, wp_4]
 	x, y, theta = [], [], []
 	for s in ls:
 		X, Y = s.split(',')
-		x.append(float(X)-CENTER[0])
-		y.append(float(Y)-CENTER[1])
+		x.append(float(X))
+		y.append(float(Y))
 		theta.append(float(0))
 	
 	try:
