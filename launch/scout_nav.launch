@@ -7,12 +7,11 @@
     <arg name="is_scout_mini" default="true" />
     <arg name="pub_tf" default="false" />
     <arg name="repeat_rate" value="50.0" />
-
+ 
     <arg name="wp_1" value="-156465.98980857083,-155514.9093946996"/>
     <arg name="wp_2" value="-156465.98980857083,-155514.9093946996"/>
     <arg name="wp_3" value="-156465.98980857083,-155514.9093946996"/>
     <arg name="wp_4" value="-156465.98980857083,-155514.9093946996"/>
-
 
     <include file="$(find scout_base)/launch/scout_base.launch">
         <arg name="port_name" default="$(arg port_name)" />
@@ -26,8 +25,8 @@
     </include-->
 
     <node name="gps1_pub" pkg="gps_nav" type="gps1_pub.py"/>
-    <node name="gps2_pub" pkg="gps_nav" type="gps2_pub.py"/>
-    <node name="current_heading_pub" pkg="gps_nav" type="dual_heading_pub.py"/>
+    <!--<node name="gps2_pub" pkg="gps_nav" type="gps2_pub.py"/>-->
+    <!--<node name="current_heading_pub" pkg="gps_nav" type="dual_heading.py"/>-->
     <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_.py"/>
 
     <node name="dest_pos_pub" pkg="gps_nav" type="get_final_dest.py">
@@ -47,4 +46,6 @@
     -->
 
     <node name="move_command" pkg="gps_nav" type="moveCmd.py"/>
+
 </launch>
+

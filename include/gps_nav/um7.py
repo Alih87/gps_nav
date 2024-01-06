@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
 	serial_port = serial.Serial(
 			port="/dev/ttyTHS1",
-			baudrate=115200,
+			baudrate=9600,
 			bytesize=serial.EIGHTBITS,
 			parity=serial.PARITY_NONE,
 			stopbits=serial.STOPBITS_ONE)
@@ -146,7 +146,7 @@ if __name__ == '__main__':
 	reg = Registers()
 	obj = UM7(serial_port, reg)
 
-	#print(obj.get_data())
+	print(obj.get_data())
 	#while True:
 	#print(obj.send_read_cmd(100))
 	#	time.sleep(0.25)
