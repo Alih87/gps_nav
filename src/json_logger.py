@@ -8,17 +8,15 @@ from gps_nav.msg import latlon_gps
 home = os.environ["HOME"]
 
 class json_node():
-	def __init__(self):
+	def __init__(self, is_scout=True):
 		self.CURR_GPS = "0, 0"
 		self.T1, self.T2 = dict(), dict()
 		self.T1_KEYS = ["waypoint_1","waypoint_2","waypoint_3","waypoint_4"]
 		self.T2_KEYS = ["engine", "winch", "mode", "feeder", "feed spread", "feed amount", "Current Location"]
+		self.is_scout = is_scout
 
 	def to_json_t1(self, data):
 		wp1, wp2, wp3, wp4 = data.wp1, data.wp2, data.wp3, data.wp4
-			
-		#json_data = json.dumps([wp1, wp2, wp3, wp4])
-		#print(json_data)
 		self.T1 = dict(zip(self.T1_KEYS, [wp1, wp2, wp3, wp4]))
 
 	def to_json_t2(self, data):
@@ -40,7 +38,6 @@ class json_node():
 			feeder = "OFF"
 
 		data = [engine, winch, mode, feeder, F_sp, F_amt, self.CURR_GPS]
-		#print(json_data)
 		self.T2 = dict(zip(self.T2_KEYS, data))
 
 	def to_strng(self, data):
@@ -52,14 +49,16 @@ class json_node():
 		rospy.sleep(0.01)
 
 	def table2_sub(self):
-		rospy.init_node('json_log_sub', anonymous=False)
-		rospy.Subscriber("boat_status", status, self.to_json_t2)
-		rospy.sleep(0.01)
+		if not self.is_scout:
+			rospy.init_node('json_log_sub', anonymous=False)
+			rospy.Subscriber("boat_status", status, self.to_json_t2)
+			rospy.sleep(0.01)
 
 	def latlon_sub(self):
-		rospy.init_node('json_log_sub', anonymous=False)
-		rospy.Subscriber("gps_pos", latlon_gps, self.to_strng)
-		rospy.sleep(0.01)
+		if not self.is_scout:
+			rospy.init_node('json_log_sub', anonymous=False)
+			rospy.Subscriber("gps_pos", latlon_gps, self.to_strng)
+			rospy.sleep(0.01)
 
 if __name__ == '__main__':
 	t1_path = home+"/share/table1.json"
@@ -71,7 +70,7 @@ if __name__ == '__main__':
 	prev_t = int(dt[-5:-3])
 	now_t = prev_t + 5
 
-	json_obj = json_node()
+	json_obj = json_node(is_scout=True)
 
 	while not rospy.is_shutdown():
 		json_obj.latlon_sub()

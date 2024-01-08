@@ -5,8 +5,8 @@ from gps_nav.msg import coordinates, pose_xy, flag
 #from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, atan2, pi
 
-
 ############### USING SCOUT ODOMETER #####################
+
 def get_theta(q):
     siny_cosp = 2*(q.w*q.z + q.x*q.z)
     cosy_cosp = 1 - 2*(q.y*q.y + q.z*q.z)

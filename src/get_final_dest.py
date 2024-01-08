@@ -37,13 +37,13 @@ class get_final_dests(object):
 		rospy.sleep(0.01)
 
 if __name__ == '__main__':
-	wp_1 = rospy.get_param("/dest_pos_pub/wp_1")
-	wp_2 = rospy.get_param("/dest_pos_pub/wp_2")
-	wp_3 = rospy.get_param("/dest_pos_pub/wp_3")
-	wp_4 = rospy.get_param("/dest_pos_pub/wp_4")
+	#wp_1 = rospy.get_param("/dest_pos_pub/wp_1")
+	#wp_2 = rospy.get_param("/dest_pos_pub/wp_2")
+	#wp_3 = rospy.get_param("/dest_pos_pub/wp_3")
+	#wp_4 = rospy.get_param("/dest_pos_pub/wp_4")
 
 	#CENTER = (388731.70, 3974424.49)
-	ls = [wp_1, wp_2, wp_3, wp_4]
+	#ls = [wp_1, wp_2, wp_3, wp_4]
 	x, y, theta = [], [], []
 	for s in ls:
 		X, Y = s.split(',')
