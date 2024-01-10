@@ -43,32 +43,19 @@ class wpsService():
 		self.x, self.y, self.theta = [], [], []
 
 	def get_wps_from_srv(self):
-		rospy.wait_for_service('wps_service')
-		wps = rospy.ServiceProxy('wps_service', wp_srv)
+		rospy.wait_for_service('wps_srv')
+		wps = rospy.ServiceProxy('wps_srv', wps_srv)
 		try:
-			self.points = wps(True)
-			print(self.points)
+			srv_resp = wps(True)
+			self.x, self.y, self.theta = srv_resp.x, srv_resp.y, srv_resp.theta 
 		except rospy.ServiceException as exc:
 			print("Service did not process request: " + str(exc))
 
 if __name__ == '__main__':
-	#wp_1 = rospy.get_param("/dest_pos_pub/wp_1")
-	#wp_2 = rospy.get_param("/dest_pos_pub/wp_2")
-	#wp_3 = rospy.get_param("/dest_pos_pub/wp_3")
-	#wp_4 = rospy.get_param("/dest_pos_pub/wp_4")
-
-	#CENTER = (388731.70, 3974424.49)
-	#ls = [wp_1, wp_2, wp_3, wp_4]
-
 	wps_response = wpsService()
 	wps_response.get_wps_from_srv()	
 
-	x, y = [], []
-	for s in ls:
-		X, Y = wps_response.points.split(',')
-		x.append(float(X))
-		y.append(float(Y))
-		theta.append(float(0))
+	x, y, theta = wps_response.x, wps_response.y, wps_response.theta
 	
 	try:
 		assert len(x) == len(y) and len(y) == len(theta) and len(x) == len(theta)
@@ -76,6 +63,11 @@ if __name__ == '__main__':
 		print("[INFO] Assertion Failed. Check number of destination TM coordinates.")
 		while(True):
 			pass
+	ls = []
+	for X, Y, TH in zip(x,y,theta):
+		wp = str(X)+","+str(Y)
+		ls.append(wp)
+
 	idx = 0
 	dests_obj = get_final_dests(x, y, theta, ls, idx)
 	print("\n[ INFO] Publishing destination information ...\n")

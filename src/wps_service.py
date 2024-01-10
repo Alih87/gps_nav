@@ -12,6 +12,7 @@ class send_wp_data():
 		self.X, self.Y, self.Theta = [], [], []
 
 	def read_file(self):
+		self.X, self.Y, self.Theta = [], [], []
 		with open(self.path) as f:
 			lines = f.readlines()
 		for line in lines:
@@ -35,7 +36,5 @@ class send_wp_data():
 if __name__ == '__main__':
 	home_dir = os.environ['HOME']
 	path = home_dir + "/boat_data/wps/wp_data.txt"
-
 	wp_data = send_wp_data(path)
-	
 	wp_data.wps_server()

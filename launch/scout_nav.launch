@@ -8,11 +8,6 @@
     <arg name="pub_tf" default="false" />
     <arg name="repeat_rate" value="50.0" />
 
-    <arg name="wp_1" value="-156465.98980857083,-155514.9093946996"/>
-    <arg name="wp_2" value="-156465.98980857083,-155514.9093946996"/>
-    <arg name="wp_3" value="-156465.98980857083,-155514.9093946996"/>
-    <arg name="wp_4" value="-156465.98980857083,-155514.9093946996"/>
-
     <include file="$(find scout_base)/launch/scout_base.launch">
         <arg name="port_name" default="$(arg port_name)" />
         <arg name="simulated_robot" default="$(arg simulated_robot)" />
@@ -25,19 +20,14 @@
         <arg name="model_xacro" default="$(arg model_xacro)"/>
     </include>
      -->
-
+    
     <node name="gps1_pub" pkg="gps_nav" type="gps1_pub.py"/>
+    <node name="waypt_service" pkg="gps_nav" type="wps_service.py"/>
     <!--<node name="gps2_pub" pkg="gps_nav" type="gps2_pub.py"/>-->
     <!--<node name="current_heading_pub" pkg="gps_nav" type="dual_heading.py"/>-->
     <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_.py"/>
 
-    <node name="dest_pos_pub" pkg="gps_nav" type="get_final_dest.py">
-    	<param name="wp_1" value="$(arg wp_1)"/>
-	<param name="wp_2" value="$(arg wp_2)"/>
-	<param name="wp_3" value="$(arg wp_3)"/>
-	<param name="wp_4" value="$(arg wp_4)"/>
-    </node>
-
+    <node name="dest_pos_pub" pkg="gps_nav" type="get_final_dest.py"/>
     <node name="optimizer_node" pkg="gps_nav" type="optimizer.py"/>
     <node name="data_logging" pkg="gps_nav" type="data_logger.py"/>
 
