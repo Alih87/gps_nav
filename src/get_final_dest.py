@@ -2,6 +2,7 @@
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
 from gps_nav.msg import coordinates, pose_xy, flag, table1
+from gps_nav.srv import wps_srv
 from math import atan, pi
 
 class get_final_dests(object):
@@ -9,6 +10,7 @@ class get_final_dests(object):
 		self.x, self.y, self.theta = x, y, theta
 		self.wp_ls = wp_ls
 		self.idx = idx
+		self.points = []
 	
 	def user_input(self, xin, yin, theta_in):
 		self.x = map(int, xin)
@@ -36,6 +38,19 @@ class get_final_dests(object):
 		rospy.Subscriber("done_flag", flag, self.done_callback)
 		rospy.sleep(0.01)
 
+class wpsService():
+	def __init__(self):
+		self.x, self.y, self.theta = [], [], []
+
+	def get_wps_from_srv(self):
+		rospy.wait_for_service('wps_service')
+		wps = rospy.ServiceProxy('wps_service', wp_srv)
+		try:
+			self.points = wps(True)
+			print(self.points)
+		except rospy.ServiceException as exc:
+			print("Service did not process request: " + str(exc))
+
 if __name__ == '__main__':
 	#wp_1 = rospy.get_param("/dest_pos_pub/wp_1")
 	#wp_2 = rospy.get_param("/dest_pos_pub/wp_2")
@@ -44,9 +59,13 @@ if __name__ == '__main__':
 
 	#CENTER = (388731.70, 3974424.49)
 	#ls = [wp_1, wp_2, wp_3, wp_4]
-	x, y, theta = [], [], []
+
+	wps_response = wpsService()
+	wps_response.get_wps_from_srv()	
+
+	x, y = [], []
 	for s in ls:
-		X, Y = s.split(',')
+		X, Y = wps_response.points.split(',')
 		x.append(float(X))
 		y.append(float(Y))
 		theta.append(float(0))
