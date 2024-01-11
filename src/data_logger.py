@@ -5,7 +5,7 @@ import os
 from gps_nav.msg import coordinates
 #from functools import partial
 
-logs_path = r"/home/boat/boat_data/"
+logs_path = r"/home/scout/boat_data/"
 
 class logger_node(object):
 	def __init__(self):

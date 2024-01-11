@@ -21,7 +21,7 @@ if __name__ == '__main__':
 	try:
 		for i in range(10):
 			serial_port = serial.Serial(
-				port="/dev/ttyTHS"+str(i),
+				port="/dev/ttyUSB"+str(i),
 				baudrate=115200,
 				bytesize=serial.EIGHTBITS,
 				parity=serial.PARITY_NONE,

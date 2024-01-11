@@ -33,6 +33,7 @@ class gps_pose_node(object):
 		z = data.pose.pose.orientation.z
 		w = data.pose.pose.orientation.w
 		angle = atan2(2.0 * (w*z), 1.0 - 2.0*(z*z))*(180/pi)
+		rospy.sleep(0.5)
 		#while self.ang_count != 16:
 		#	angle += angle
 		#	self.ang_count += 1
