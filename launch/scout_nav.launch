@@ -8,6 +8,8 @@
     <arg name="pub_tf" default="false" />
     <arg name="repeat_rate" value="50.0" />
 
+    <arg name="_port" value="/dev/ttyUSB1"/>
+
     <include file="$(find scout_base)/launch/scout_base.launch">
         <arg name="port_name" default="$(arg port_name)" />
         <arg name="simulated_robot" default="$(arg simulated_robot)" />
@@ -20,11 +22,14 @@
         <arg name="model_xacro" default="$(arg model_xacro)"/>
     </include>
      -->
-    
+    <!--<node name="current_heading_pub" pkg="gps_nav" type="dual_heading.py"/>-->
+
+    <node name="um7_device" pkg="um7" type="um7_driver">
+        <param name="_port" value="$(arg _port)"/>
+    </node>
     <node name="gps1_pub" pkg="gps_nav" type="gps1_pub.py"/>
     <node name="waypt_service" pkg="gps_nav" type="wps_service.py"/>
     <!--<node name="gps2_pub" pkg="gps_nav" type="gps2_pub.py"/>-->
-    <!--<node name="current_heading_pub" pkg="gps_nav" type="dual_heading.py"/>-->
     <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_.py"/>
 
     <node name="dest_pos_pub" pkg="gps_nav" type="get_final_dest.py"/>

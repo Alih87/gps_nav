@@ -134,7 +134,7 @@ class UM7(object):
 if __name__ == '__main__':
 
 	serial_port = serial.Serial(
-			port="/dev/ttyTHS1",
+			port="/dev/ttyUSB0",
 			baudrate=9600,
 			bytesize=serial.EIGHTBITS,
 			parity=serial.PARITY_NONE,
