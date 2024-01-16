@@ -72,7 +72,7 @@ class optimizer_node():
 		rospy.init_node('optimizer', anonymous=False)
 		pub = rospy.Publisher('done_flag', flag, queue_size=10)
 		pub.publish(done)
-	
+
 	def get_dest_state(self, data):
 		self.dest_x, self.dest_y, self.dest_theta = data.x, data.y, data.theta
 
@@ -96,14 +96,14 @@ class optimizer_node():
 		self.y = self.dest_y - self.curr_y
 		self.theta = (self.calculate_angle2(self.x, self.y) - self.curr_theta)
 		if self.theta > 180:
-			self.theta = self.theta - 360
+			self.theta = self.theta - 359
 		elif self.theta < -180:
 			self.theta = 360 + self.theta
 
 		'''
 		Checks whether the current angle is within the 90 degree (at max) arc.
 		'''
-		if self.theta < -30 or self.theta > 30:
+		if self.theta < -5 or self.theta > 5:
 			self.theta_done = False
 		else:
 			self.theta_done = True

@@ -35,7 +35,7 @@ class gps_pose_node(object):
 	elif self.is_scout:
 		z = data.pose.pose.orientation.z
 		w = data.pose.pose.orientation.w
-		angle = atan2(2.0 * (w*z), 1.0 - 2.0*(z*z))*(180/pi)
+		angle = atan2(2.0*(w*z), 1.0 - 2.0*(z*z))*(180/pi)
 		#rospy.sleep(0.5)
 		#while self.ang_count != 16:
 		#	angle += angle
@@ -48,12 +48,12 @@ class gps_pose_node(object):
 
     def gps_sub(self):
         rospy.init_node('gps_pose', anonymous=False)
-        rospy.Subscriber('gps_pos1', latlon_gps, self.get_utm)
+        rospy.Subscriber('gps_pos2', latlon_gps, self.get_utm)
         rospy.sleep(0.01)
 
     def mag_sub(self):
         rospy.init_node('gps_pose', anonymous=False)
-	if not self.is_scout and not self.imu_ros:
+	if (not self.is_scout) and (not self.imu_ros):
         	rospy.Subscriber('um7_heading', heading_ang, self.get_heading)
 	elif self.is_scout:
 		rospy.Subscriber('odom', Odometry, self.get_heading)
@@ -62,7 +62,7 @@ class gps_pose_node(object):
 
     def utm_pub(self):
         rospy.init_node('gps_pose', anonymous=False)
-        pub = rospy.Publisher('odom_pose', coordinates, queue_size=10)
+        pub = rospy.Publisher('odom_pose', coordinates, queue_size=1)
         pub.publish(self.X,self.Y,self.HEADING)
         rospy.sleep(0.01)
 
