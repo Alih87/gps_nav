@@ -27,28 +27,34 @@ class move_node(object):
 
 		return self.linear_spd, self.angular_spd
 
+	def to_2pi(self, angle):
+		if angle < 0 and angle > -180:
+			return 360-angle
+		return angle
+
 	def scout_ctrl_command(self):
 		T = Twist()
 		rospy.init_node('scout_ctrl', anonymous=False)
-		pub = rospy.Publisher('cmd_vel', Twist, queue_size=30)
+		pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
 
 		self.linear_spd, self.angular_spd = self.regulate(self.linear_spd, self.angular_spd)
 
 		hyp = (self.x_est**2 + self.y_est**2)**0.5
-		if not self.theta_done and not self.linear_done:
-			if self.theta_est < 15 and self.theta_est > -15:
+		if not self.theta_done or not self.linear_done:
+			if self.theta_done:
 				T.linear.x = 0
 				T.linear.y = 0
 				T.linear.z = 0
 				T.angular.z = 0
+				rospy.sleep(0.25)
 
-			elif (self.theta_est/abs(self.theta_est)) > 0:
+			elif self.to_2pi(self.theta_est) >= 180:
 				T.linear.x = 0
 				T.linear.y = 0
 				T.linear.z = 0
 				T.angular.z = -1*self.angular_spd
 
-			elif (self.theta_est/abs(self.theta_est)) < 0:
+			elif self.to_2pi(self.theta_est) < 180:
 				T.linear.x = 0
 				T.linear.y = 0
 				T.linear.z = 0
@@ -75,5 +81,5 @@ class move_node(object):
 if __name__ == '__main__':
 	move_obj = move_node()
 	while not rospy.is_shutdown():
-		move_obj.scout_ctrl_command()
 		move_obj.feedback_ctrl_msg()
+		move_obj.scout_ctrl_command()

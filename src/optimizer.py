@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
+from gps_nav.srv import flag_srv
 from gps_nav.msg import coordinates, pose_xy, flag
 #from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, atan2, pi
@@ -68,10 +69,21 @@ class optimizer_node():
 	def make_done_false(self):
 		self.theta_done, self.linear_done = False, False
 
-	def update_done_flag(self, done=False):
-		rospy.init_node('optimizer', anonymous=False)
-		pub = rospy.Publisher('done_flag', flag, queue_size=10)
-		pub.publish(done)
+	#def update_done_flag(self, done=False):
+	#	rospy.init_node('optimizer', anonymous=False)
+	#	pub = rospy.Publisher('done_flag', flag, queue_size=1)
+	#	pub.publish(done)
+
+	def update_flag_srv(self):
+		rospy.wait_for_service('done_flag_srv')
+		wps = rospy.ServiceProxy('done_flag_srv', flag_srv)
+		try:
+			srv_resp = wps(True)
+			resp = srv_resp.fb
+			if not resp:
+				raise Exception("False response from Service.")
+		except rospy.ServiceException as exc:
+			print("Service did not process request: " + str(exc))
 
 	def get_dest_state(self, data):
 		self.dest_x, self.dest_y, self.dest_theta = data.x, data.y, data.theta
@@ -91,7 +103,7 @@ class optimizer_node():
 
 	def to_go(self):
 		rospy.init_node('optimizer', anonymous=False)
-		pub = rospy.Publisher('feedback', pose_xy, queue_size=30)
+		pub = rospy.Publisher('feedback', pose_xy, queue_size=5)
 		self.x = self.dest_x - self.curr_x
 		self.y = self.dest_y - self.curr_y
 		self.theta = (self.calculate_angle2(self.x, self.y) - self.curr_theta)
@@ -103,7 +115,7 @@ class optimizer_node():
 		'''
 		Checks whether the current angle is within the 90 degree (at max) arc.
 		'''
-		if self.theta < -5 or self.theta > 5:
+		if (self.theta < -5 or self.theta > 5) and not self.theta_done:
 			self.theta_done = False
 		else:
 			self.theta_done = True
@@ -111,19 +123,18 @@ class optimizer_node():
 		'''
 		Checks whether the current position is within 15 meters range (at max).
 		'''
-		if (self.x**2 + self.y**2)**0.5 < 0.5:
-			self.linear_done = True
-		else:
+		if ((self.x**2 + self.y**2)**0.5 > 0.25):
 			self.linear_done = False
+		else:
+			self.linear_done = True
 
 		'''
 		If both angular and linear position is within the required range, complete the path and move to the next destination points.
 		'''
 		if self.linear_done and self.theta_done:
 			self.theta_done, self.linear_done = False, False
-			self.update_done_flag(True)
 		else:
-			self.update_done_flag()
+			self.update_flag_srv()
 
 		pub.publish(self.x, self.y, self.theta, self.theta_done, self.linear_done)
 		rospy.sleep(0.01)

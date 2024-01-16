@@ -2,7 +2,7 @@
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
 from gps_nav.msg import coordinates, pose_xy, flag, table1
-from gps_nav.srv import wps_srv
+from gps_nav.srv import wps_srv, flag_srv, flag_srvResponse
 from math import atan, pi
 
 class get_final_dests(object):
@@ -17,26 +17,31 @@ class get_final_dests(object):
 		self.y = map(int, yin)
 		self.theta = map(float, theta_in)
 
-	def done_callback(self, data):
-		if data.flag:
+	def done_callback(self, req):
+		if req.cmd:
 			self.idx += 1
+			return flag_srvResponse(True)
 		else:
-			pass
+			return flag_srvResponse(False)
 		
 	def publish_curr_final_pos(self):
 		rospy.init_node("current_final_pos", anonymous=False)
-		pub = rospy.Publisher("final_pos", coordinates, queue_size=10)
+		pub = rospy.Publisher("final_pos", coordinates, queue_size=1)
 		pub.publish(self.x[self.idx], self.y[self.idx], self.theta[self.idx])
 
 	def publish_dest_wp(self):
 		rospy.init_node("current_final_pos", anonymous=False)
-		pub = rospy.Publisher("wp_table1", table1, queue_size=10)
+		pub = rospy.Publisher("wp_table1", table1, queue_size=1)
 		pub.publish(self.wp_ls[0], self.wp_ls[1], self.wp_ls[2], self.wp_ls[3])
 
-	def complete_flag_sub(self):
-		rospy.init_node('current_final_pos', anonymous=False)
-		rospy.Subscriber("done_flag", flag, self.done_callback)
-		rospy.sleep(0.01)
+	#def complete_flag_sub(self):
+	#	rospy.init_node('current_final_pos', anonymous=False)
+	#	rospy.Subscriber("done_flag", flag, self.done_callback)
+	
+	def done_flag_server(self):
+		rospy.init_node('current_final_pos')
+		s = rospy.Service('done_flag_srv', flag_srv, self.done_callback)
+		rospy.spin()
 
 class wpsService():
 	def __init__(self):
@@ -75,7 +80,7 @@ if __name__ == '__main__':
 		if dests_obj.idx < len(ls):
 			dests_obj.publish_curr_final_pos()
 			dests_obj.publish_dest_wp()
-			dests_obj.complete_flag_sub()
+			dests_obj.done_flag_server()
 		else:
 			break
 		#if idx >= len(x):

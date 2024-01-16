@@ -66,6 +66,7 @@ catkin_python_setup()
  add_service_files(
    FILES
    wps_srv.srv
+   flag_srv.srv
  )
 
 ## Generate actions in the 'action' folder
