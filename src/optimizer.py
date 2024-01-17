@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
-from gps_nav.srv import flag_srv
+from gps_nav.srv import flag_srv, feedback_srv
 from gps_nav.msg import coordinates, pose_xy, flag
 #from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, atan2, pi
@@ -94,12 +94,12 @@ class optimizer_node():
 	def get_dest_pose(self):
 		rospy.init_node('optimizer', anonymous=False)
 		rospy.Subscriber('final_pos', coordinates, self.get_dest_state)
-		rospy.sleep(0.01)
+		#rospy.sleep(0.01)
 
 	def get_curr_pose(self):
 		rospy.init_node('optimizer', anonymous=False)
 		rospy.Subscriber('odom_pose', coordinates, self.get_state)
-		rospy.sleep(0.01)
+		#rospy.sleep(0.01)
 
 	def to_go(self):
 		rospy.init_node('optimizer', anonymous=False)
@@ -121,7 +121,7 @@ class optimizer_node():
 		else:
 			self.theta_done = True
 			resp = pub(self.x, self.y, self.theta, self.theta_done, self.linear_done)
-			if not resp:
+			if not resp.done:
 				raise Exception("False response from Optimizer Service.")
 		'''
 		Checks whether the current position is within 25 centimeters range (at max).
@@ -131,7 +131,7 @@ class optimizer_node():
 		else:
 			self.linear_done = True
 			resp = pub(self.x, self.y, self.theta, self.theta_done, self.linear_done)
-			if not resp:
+			if not resp.done:
 				raise Exception("False response from Optimizer Service.")
 		'''
 		If both angular and linear position is within the required range, complete the path and move to the next destination points.
@@ -140,17 +140,16 @@ class optimizer_node():
 			self.theta_done, self.linear_done = False, False
 			self.update_flag_srv()
 			resp = pub(self.x, self.y, self.theta, self.theta_done, self.linear_done)
-			if not resp:
+			if not resp.done:
 				raise Exception("False response from Optimizer Service.")
 
 if __name__ == '__main__':
 	optim_obj = optimizer_node()
 	print("[INFO] Initialized Optimization Node.")
 	while not rospy.is_shutdown():
-		optim_obj.get_curr_pose()
 		optim_obj.get_dest_pose()
+		optim_obj.get_curr_pose()
 		optim_obj.to_go()
-
 	#get_xy_pose()
         #get_dest_xy_pose()
         #dist_to_go()

@@ -26,12 +26,12 @@ class get_final_dests(object):
 		
 	def publish_curr_final_pos(self):
 		rospy.init_node("current_final_pos", anonymous=False)
-		pub = rospy.Publisher("final_pos", coordinates, queue_size=1)
+		pub = rospy.Publisher("final_pos", coordinates, queue_size=10)
 		pub.publish(self.x[self.idx], self.y[self.idx], self.theta[self.idx])
 
 	def publish_dest_wp(self):
 		rospy.init_node("current_final_pos", anonymous=False)
-		pub = rospy.Publisher("wp_table1", table1, queue_size=1)
+		pub = rospy.Publisher("wp_table1", table1, queue_size=10)
 		pub.publish(self.wp_ls[0], self.wp_ls[1], self.wp_ls[2], self.wp_ls[3])
 
 	#def complete_flag_sub(self):
@@ -41,7 +41,6 @@ class get_final_dests(object):
 	def done_flag_server(self):
 		rospy.init_node('current_final_pos')
 		s = rospy.Service('done_flag_srv', flag_srv, self.done_callback)
-		rospy.spin()
 
 class wpsService():
 	def __init__(self):
@@ -54,7 +53,7 @@ class wpsService():
 			srv_resp = wps(True)
 			self.x, self.y, self.theta = srv_resp.x, srv_resp.y, srv_resp.theta 
 		except rospy.ServiceException as exc:
-			print("Service did not process request: " + str(exc))
+			print("wps Service did not process request: " + str(exc))
 
 if __name__ == '__main__':
 	wps_response = wpsService()
@@ -75,12 +74,12 @@ if __name__ == '__main__':
 
 	idx = 0
 	dests_obj = get_final_dests(x, y, theta, ls, idx)
+	dests_obj.done_flag_server()
 	print("\n[ INFO] Publishing destination information ...\n")
 	while not rospy.is_shutdown():
 		if dests_obj.idx < len(ls):
 			dests_obj.publish_curr_final_pos()
 			dests_obj.publish_dest_wp()
-			dests_obj.done_flag_server()
 		else:
 			break
 		#if idx >= len(x):

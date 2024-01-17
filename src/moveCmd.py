@@ -35,7 +35,7 @@ class move_node(object):
 	def scout_ctrl_command(self):
 		T = Twist()
 		rospy.init_node('scout_ctrl', anonymous=False)
-		pub = rospy.Publisher('cmd_vel', Twist, queue_size=5)
+		pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
 
 		self.linear_spd, self.angular_spd = self.regulate(self.linear_spd, self.angular_spd)
 
@@ -72,19 +72,21 @@ class move_node(object):
 
 	def sub_ctrl_msg(self, req):
 		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = req.x, req.y, req.theta, req.theta_done, req.linear_done
-		try:
+		print(self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done)
+		rcv = True
+		if rcv:
 			self.scout_ctrl_command()
 			return feedback_srvResponse(True)
-		except:
+		else:
 			print("Did not work!")
 			return feedback_srvResponse(False)
 
 	def feedback_ctrl_msg(self):
 		rospy.init_node('scout_ctrl', anonymous=False)
-		rospy.Service("feedback_srv", feedback_srv, self.sub_ctrl_msg)
+		fb_s = rospy.Service("feedback_srv", feedback_srv, self.sub_ctrl_msg)
 
 if __name__ == '__main__':
 	move_obj = move_node()
+	move_obj.feedback_ctrl_msg()
 	while not rospy.is_shutdown():
-		move_obj.feedback_ctrl_msg()
 		move_obj.scout_ctrl_command()
