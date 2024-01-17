@@ -2,8 +2,8 @@
 import roslib; roslib.load_manifest('gps_nav')
 import rospy
 import sys
-from gps_nav.msg import can_pose
-from gps_nav.msg import pose_xy
+from gps_nav.msg import can_pose, pose_xy
+from gps_nav.srv import feedback_srv, feedback_srvResponse
 from geometry_msgs.msg import Twist
 
 # x_dest, y_dest, theta_dest = 0, 0, 0
@@ -35,18 +35,17 @@ class move_node(object):
 	def scout_ctrl_command(self):
 		T = Twist()
 		rospy.init_node('scout_ctrl', anonymous=False)
-		pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
+		pub = rospy.Publisher('cmd_vel', Twist, queue_size=5)
 
 		self.linear_spd, self.angular_spd = self.regulate(self.linear_spd, self.angular_spd)
 
 		hyp = (self.x_est**2 + self.y_est**2)**0.5
-		if not self.theta_done or not self.linear_done:
+		if not self.theta_done and not self.linear_done:
 			if self.theta_done:
 				T.linear.x = 0
 				T.linear.y = 0
 				T.linear.z = 0
 				T.angular.z = 0
-				rospy.sleep(0.25)
 
 			elif self.to_2pi(self.theta_est) >= 180:
 				T.linear.x = 0
@@ -71,12 +70,18 @@ class move_node(object):
 
 		pub.publish(T)
 
-	def sub_ctrl_msg(self, data):
-		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = data.x, data.y, data.theta, data.theta_done, data.linear_done
+	def sub_ctrl_msg(self, req):
+		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = req.x, req.y, req.theta, req.theta_done, req.linear_done
+		try:
+			self.scout_ctrl_command()
+			return feedback_srvResponse(True)
+		except:
+			print("Did not work!")
+			return feedback_srvResponse(False)
 
 	def feedback_ctrl_msg(self):
 		rospy.init_node('scout_ctrl', anonymous=False)
-		rospy.Subscriber("feedback", pose_xy, self.sub_ctrl_msg)
+		rospy.Service("feedback_srv", feedback_srv, self.sub_ctrl_msg)
 
 if __name__ == '__main__':
 	move_obj = move_node()
