@@ -1,0 +1,7 @@
+float32 x
+float32 y
+float32 theta
+bool theta_done
+bool linear_done
+---
+bool done
