@@ -2,7 +2,7 @@
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
 from gps_nav.msg import coordinates, pose_xy, flag, table1
-from gps_nav.srv import wps_srv, flag_srv, flag_srvResponse
+from gps_nav.srv import wps_srv, flag_srv, flag_srvResponse, final_pos_srv
 from math import atan, pi
 
 class get_final_dests(object):
@@ -11,7 +11,7 @@ class get_final_dests(object):
 		self.wp_ls = wp_ls
 		self.idx = idx
 		self.points = []
-	
+
 	def user_input(self, xin, yin, theta_in):
 		self.x = map(int, xin)
 		self.y = map(int, yin)
@@ -20,18 +20,28 @@ class get_final_dests(object):
 	def done_callback(self, req):
 		if req.cmd:
 			self.idx += 1
+			self.publish_curr_final_pos()
 			return flag_srvResponse(True)
 		else:
 			return flag_srvResponse(False)
-		
+
 	def publish_curr_final_pos(self):
 		rospy.init_node("current_final_pos", anonymous=False)
-		pub = rospy.Publisher("final_pos", coordinates, queue_size=10)
-		pub.publish(self.x[self.idx], self.y[self.idx], self.theta[self.idx])
+		rospy.wait_for_service('final_pos_srv')
+		pub = rospy.ServiceProxy("final_pos_srv", final_pos_srv)
+		try:
+			srv_resp = pub(self.x[self.idx], self.y[self.idx], self.theta[self.idx])
+			resp = srv_resp.done
+			if resp:
+				print("[INFO] Destination Incremented!")
+			else:
+				print("[INFO] Got zero as destination point.")
+		except rospy.ServiceException as exc:
+			print("[INFO] Final Position Service did not process request: " + str(exc))
 
 	def publish_dest_wp(self):
 		rospy.init_node("current_final_pos", anonymous=False)
-		pub = rospy.Publisher("wp_table1", table1, queue_size=10)
+		pub = rospy.Publisher("wp_table1", table1, queue_size=1)
 		pub.publish(self.wp_ls[0], self.wp_ls[1], self.wp_ls[2], self.wp_ls[3])
 
 	#def complete_flag_sub(self):
@@ -53,7 +63,7 @@ class wpsService():
 			srv_resp = wps(True)
 			self.x, self.y, self.theta = srv_resp.x, srv_resp.y, srv_resp.theta 
 		except rospy.ServiceException as exc:
-			print("wps Service did not process request: " + str(exc))
+			print("[INFO] wps Service did not process request: " + str(exc))
 
 if __name__ == '__main__':
 	wps_response = wpsService()
@@ -75,10 +85,10 @@ if __name__ == '__main__':
 	idx = 0
 	dests_obj = get_final_dests(x, y, theta, ls, idx)
 	dests_obj.done_flag_server()
-	print("\n[ INFO] Publishing destination information ...\n")
+	dests_obj.publish_curr_final_pos()
+	print("\n[INFO] Publishing destination information ...\n")
 	while not rospy.is_shutdown():
 		if dests_obj.idx < len(ls):
-			dests_obj.publish_curr_final_pos()
 			dests_obj.publish_dest_wp()
 		else:
 			break

@@ -10,7 +10,7 @@ from math import atan, atan2, pi
 
 # HEADING = deque(maxlen=5)
 class gps_pose_node(object):
-    def __init__(self, is_scout=False, imu_ros=False):
+    def __init__(self, is_scout=False, scout_odom=False, imu_ros=False):
         #self.CENTER = (388731.70, 3974424.49)
         self.ZONE = ''
         self.X = 0
@@ -18,6 +18,7 @@ class gps_pose_node(object):
         self.HEADING = 0
 	self.is_scout = is_scout
 	self.imu_ros = imu_ros
+	self.scout_odom = scout_odom
 	self.ang_count = 0
 
     def get_utm(self, data):
@@ -26,6 +27,11 @@ class gps_pose_node(object):
         #self.X, self.Y = self.X - self.CENTER[0], self.Y - self.CENTER[1]
         #self.X, self.Y = self.X, self.Y
         #ZONE = str(zo)+ne
+
+    def get_scout_odom(self, data):
+	x = data.pose.pose.position.x
+	y = data.pose.pose.position.y
+	self.X, self.Y = x, y
 
     def get_heading(self, data):
 	if not self.is_scout and not self.imu_ros:
@@ -47,9 +53,12 @@ class gps_pose_node(object):
 		self.HEADING = angle
 
     def gps_sub(self):
-        rospy.init_node('gps_pose', anonymous=False)
-        rospy.Subscriber('gps_pos2', latlon_gps, self.get_utm)
-        rospy.sleep(0.01)
+	if not self.scout_odom:
+		rospy.init_node('gps_pose', anonymous=False)
+		rospy.Subscriber('gps_pos2', latlon_gps, self.get_utm)
+	else:
+		rospy.init_node('gps_pose', anonymous=False)
+		rospy.Subscriber('odom', Odometry, self.get_scout_odom)
 
     def mag_sub(self):
         rospy.init_node('gps_pose', anonymous=False)
@@ -64,10 +73,10 @@ class gps_pose_node(object):
         rospy.init_node('gps_pose', anonymous=False)
         pub = rospy.Publisher('odom_pose', coordinates, queue_size=1)
         pub.publish(self.X,self.Y,self.HEADING)
-        rospy.sleep(0.01)
+	rospy.sleep(0.025)
 
 if __name__== '__main__':
-    gps_pose_obj = gps_pose_node(is_scout=False, imu_ros=True)
+    gps_pose_obj = gps_pose_node(is_scout=False, scout_odom=True, imu_ros=True)
     print("[ INFO] Initialized GPS and Heading Node.")
     while not rospy.is_shutdown():
         gps_pose_obj.gps_sub()

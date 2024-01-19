@@ -40,7 +40,7 @@ class move_node(object):
 		self.linear_spd, self.angular_spd = self.regulate(self.linear_spd, self.angular_spd)
 
 		hyp = (self.x_est**2 + self.y_est**2)**0.5
-		if not self.theta_done and not self.linear_done:
+		if (not self.theta_done and not self.linear_done) or self.theta_done and self.linear_done:
 			if self.theta_done:
 				T.linear.x = 0
 				T.linear.y = 0
@@ -72,10 +72,11 @@ class move_node(object):
 
 	def sub_ctrl_msg(self, req):
 		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = req.x, req.y, req.theta, req.theta_done, req.linear_done
-		print(self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done)
+		#print(self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done)
 		rcv = True
 		if rcv:
 			self.scout_ctrl_command()
+			rcv = False
 			return feedback_srvResponse(True)
 		else:
 			print("Did not work!")

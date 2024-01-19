@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
-from gps_nav.srv import flag_srv, feedback_srv
+from gps_nav.srv import flag_srv, feedback_srv, final_pos_srv, final_pos_srvResponse
 from gps_nav.msg import coordinates, pose_xy, flag
 #from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, atan2, pi
@@ -81,19 +81,29 @@ class optimizer_node():
 			srv_resp = wps(True)
 			resp = srv_resp.fb
 			if not resp:
-				raise Exception("False response from Service.")
+				raise Exception("[INFO] False response from update flag Service.")
 		except rospy.ServiceException as exc:
-			print("Flag Update Service did not process request: " + str(exc))
+			print("[INFO] Flag Update Service did not process request: " + str(exc))
 
-	def get_dest_state(self, data):
-		self.dest_x, self.dest_y, self.dest_theta = data.x, data.y, data.theta
+	def get_dest_state(self, req):
+		self.dest_x, self.dest_y, self.dest_theta = req.x, req.y, req.theta
+		print(self.dest_x, self.dest_y)
+		rcv = self.dest_x == 0 and self.dest_y == 0
+		if rcv:
+			rcv = False
+			return final_pos_srvResponse(True)
+		elif (self.dest_x**2 + self.dest_y**2)**0.5 > 0.25:
+			return final_pos_srvResponse(True)
+		else:
+			print("Did not work!")
+			return final_pos_srvResponse(False)
 
 	def get_state(self, data):
 		self.curr_x, self.curr_y, self.curr_theta = data.x, data.y, data.theta
 
 	def get_dest_pose(self):
 		rospy.init_node('optimizer', anonymous=False)
-		rospy.Subscriber('final_pos', coordinates, self.get_dest_state)
+		rospy.Service('final_pos_srv', final_pos_srv, self.get_dest_state)
 		#rospy.sleep(0.01)
 
 	def get_curr_pose(self):
@@ -105,8 +115,11 @@ class optimizer_node():
 		rospy.init_node('optimizer', anonymous=False)
 		rospy.wait_for_service('feedback_srv')
 		pub = rospy.ServiceProxy('feedback_srv', feedback_srv)
+		#self.get_dest_pose()
+		#self.get_curr_pose()
 		self.x = self.dest_x - self.curr_x
 		self.y = self.dest_y - self.curr_y
+
 		self.theta = (self.calculate_angle2(self.x, self.y) - self.curr_theta)
 		if self.theta > 180:
 			self.theta = self.theta - 359
@@ -114,25 +127,30 @@ class optimizer_node():
 			self.theta = 360 + self.theta
 
 		'''
-		Checks whether the current angle is within the 10 degree (at max) arc.
+		Checks whether the current angle is within the 3 degree (at max) arc.
 		'''
-		if (self.theta < -5 or self.theta > 5) and not self.theta_done:
+		if (self.theta < -1.5 or self.theta > 1.5) and not self.theta_done:
 			self.theta_done = False
 		else:
 			self.theta_done = True
 			resp = pub(self.x, self.y, self.theta, self.theta_done, self.linear_done)
 			if not resp.done:
-				raise Exception("False response from Optimizer Service.")
+				raise Exception("[INFO] False response from Optimizer Service.")
+
 		'''
-		Checks whether the current position is within 25 centimeters range (at max).
+		Checks whether the current position is within 25 centimeters radius (at max).
 		'''
-		if ((self.x**2 + self.y**2)**0.5 > 0.25):
+		if ((self.x**2 + self.y**2)**0.5 > 0.25) and self.theta_done:
 			self.linear_done = False
-		else:
+		elif self.theta_done and not self.linear_done:
 			self.linear_done = True
 			resp = pub(self.x, self.y, self.theta, self.theta_done, self.linear_done)
+			#self.update_flag_srv()
+			self.linear_done = False
+			self.theta_done = False
 			if not resp.done:
-				raise Exception("False response from Optimizer Service.")
+				raise Exception("[INFO] False response from Optimizer Service.")
+
 		'''
 		If both angular and linear position is within the required range, complete the path and move to the next destination points.
 		'''
@@ -141,13 +159,27 @@ class optimizer_node():
 			self.update_flag_srv()
 			resp = pub(self.x, self.y, self.theta, self.theta_done, self.linear_done)
 			if not resp.done:
-				raise Exception("False response from Optimizer Service.")
+				raise Exception("[INFO] False response from Optimizer Service.")
+			self.theta_done, self.linear_done = False, False
+			#self.get_dest_pose()
+			#self.get_curr_pose()
+
+		elif not self.linear_done and not self.theta_done:
+			#self.update_flag_srv()
+			self.theta_done, self.linear_done = False, False
+			resp = pub(self.x, self.y, self.theta, self.theta_done, self.linear_done)
+			if not resp.done:
+				raise Exception("[INFO] False response from Optimizer Service.")
+			#self.get_dest_pose()
+			#self.get_curr_pose()
+			#self.theta_done, self.linear_done = False, False
+		rospy.sleep(0.005)
 
 if __name__ == '__main__':
 	optim_obj = optimizer_node()
 	print("[INFO] Initialized Optimization Node.")
+	optim_obj.get_dest_pose()
 	while not rospy.is_shutdown():
-		optim_obj.get_dest_pose()
 		optim_obj.get_curr_pose()
 		optim_obj.to_go()
 	#get_xy_pose()
