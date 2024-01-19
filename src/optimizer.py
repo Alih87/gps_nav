@@ -87,7 +87,6 @@ class optimizer_node():
 
 	def get_dest_state(self, req):
 		self.dest_x, self.dest_y, self.dest_theta = req.x, req.y, req.theta
-		print(self.dest_x, self.dest_y)
 		rcv = self.dest_x == 0 and self.dest_y == 0
 		if rcv:
 			rcv = False
@@ -140,14 +139,14 @@ class optimizer_node():
 		'''
 		Checks whether the current position is within 25 centimeters radius (at max).
 		'''
-		if ((self.x**2 + self.y**2)**0.5 > 0.25) and self.theta_done:
+		if ((self.x**2 + self.y**2)**0.5 > 0.45) and self.theta_done:
 			self.linear_done = False
 		elif self.theta_done and not self.linear_done:
 			self.linear_done = True
 			resp = pub(self.x, self.y, self.theta, self.theta_done, self.linear_done)
 			#self.update_flag_srv()
-			self.linear_done = False
-			self.theta_done = False
+			#self.linear_done = False
+			#self.theta_done = False
 			if not resp.done:
 				raise Exception("[INFO] False response from Optimizer Service.")
 
@@ -182,6 +181,7 @@ if __name__ == '__main__':
 	while not rospy.is_shutdown():
 		optim_obj.get_curr_pose()
 		optim_obj.to_go()
+		print("Next Destination", optim_obj.dest_x, optim_obj.dest_y)
 	#get_xy_pose()
         #get_dest_xy_pose()
         #dist_to_go()
