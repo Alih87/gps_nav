@@ -51,7 +51,7 @@ def prune_wpts(path_to_raw):
     	lines = f.readlines()
     	line = [l.splitlines() for l in lines]
     	for l in line:
-    		x, y, theta = l[0].split(',')
+    		x, y, theta, _ = l[0].split(',')
     		x_l.append(float(x))
     		y_l.append(float(y))	
     		theta_l.append(float(theta))
@@ -79,10 +79,10 @@ def prune_wpts(path_to_raw):
     m = np.concatenate(([False], diff > THRES))
     
     x_pts, y_pts = np.array(x_pts)[~m].tolist(), np.array(y_pts)[~m].tolist()
-    x_pts.insert(0,x_f[0])
-    x_pts.append(x_l[-1])
-    y_pts.insert(0,y_f[0])
-    y_pts.append(y_l[-1])
+    #x_pts.insert(0,x_f[0])
+    #x_pts.append(x_l[-1])
+    #y_pts.insert(0,y_f[0])
+    #y_pts.append(y_l[-1])
 
     for i in range(len(x_pts)):
         content.append(str(x_pts[i])+","+str(y_pts[i])+"\n")
@@ -97,8 +97,8 @@ if __name__ == '__main__':
 		    help="Provide a valid path to the destination folder to save pruned UTM points")
 	args = parser.parse_args()
 	content = prune_wpts(args.src_file_path)
-
-	with open(args.dest_file_path, "w") as f:
+	dest_file_name = args.src_file_path.split('/')[-1].split('.')[0]
+	with open(args.dest_file_path+"/"+dest_file_name+"_pruned.txt", "w") as f:
 		for line in content:
 			f.write(line)
 		f.close()

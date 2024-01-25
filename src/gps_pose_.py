@@ -2,6 +2,7 @@
 import roslib; roslib.load_manifest('gps_nav')
 import rospy, sys
 from gps_nav.msg import coordinates, pose_xy, latlon_gps, heading_ang
+from gps_nav.srv import gps_pos_srv, utm_srv, gps_pos_srvResponse
 #from sbg_driver.msg import SbgGpsPos, SbgMag
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Vector3Stamped
@@ -27,6 +28,14 @@ class gps_pose_node(object):
         #self.X, self.Y = self.X - self.CENTER[0], self.Y - self.CENTER[1]
         #self.X, self.Y = self.X, self.Y
         #ZONE = str(zo)+ne
+
+    def get_utm_srv(self, req):
+	lat, long = req.lat, req.lon
+        self.X, self.Y, zo, ne = from_latlon(lat, long)
+	if self.X or self.Y:
+		return gps_pos_srvResponse(True)
+	else:
+		return gps_pos_srvResponse(False)
 
     def get_scout_odom(self, data):
 	x = data.pose.pose.position.x
@@ -60,6 +69,10 @@ class gps_pose_node(object):
 		rospy.init_node('gps_pose', anonymous=False)
 		rospy.Subscriber('odom', Odometry, self.get_scout_odom)
 
+    def gps_sub_Service(self):
+	rospy.init_node('gps_pose', anonymous=False)
+	gps_srv = rospy.Service('gps_pos_srv', gps_pos_srv, self.get_utm_srv)
+
     def mag_sub(self):
         rospy.init_node('gps_pose', anonymous=False)
 	if (not self.is_scout) and (not self.imu_ros):
@@ -75,14 +88,24 @@ class gps_pose_node(object):
         pub.publish(self.X,self.Y,self.HEADING)
 	rospy.sleep(0.025)
 
-if __name__== '__main__':
-    gps_pose_obj = gps_pose_node(is_scout=False, scout_odom=True, imu_ros=True)
-    print("[ INFO] Initialized GPS and Heading Node.")
-    while not rospy.is_shutdown():
-        gps_pose_obj.gps_sub()
-        gps_pose_obj.mag_sub()
-        gps_pose_obj.utm_pub()
+    def utm_pub_srv(self):
+	rospy.init_node('gps_pose', anonymous=False)
+	pub = rospy.ServiceProxy('utm_srv', utm_srv)
+	resp = pub(self.X, self.Y, self.HEADING)
+	
+	if not resp.done:
+		raise Exception("[INFO] False response from utm publishing Service.")
 
+if __name__== '__main__':
+    gps_pose_obj = gps_pose_node(is_scout=False, scout_odom=False, imu_ros=True)
+    print("[ INFO] Initialized GPS and Heading Node.")
+    gps_pose_obj.gps_sub_Service()
+    while not rospy.is_shutdown():
+	print("Current Position", gps_pose_obj.X, gps_pose_obj.Y, gps_pose_obj.HEADING)
+        #gps_pose_obj.gps_sub()
+        gps_pose_obj.mag_sub()
+        #gps_pose_obj.utm_pub()
+	gps_pose_obj.utm_pub_srv()
 	     # Using Scout Odometer
 		# odom_sub()
 		# odom_pub()

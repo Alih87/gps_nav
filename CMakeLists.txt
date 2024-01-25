@@ -69,6 +69,10 @@ catkin_python_setup()
    flag_srv.srv
    feedback_srv.srv
    final_pos_srv.srv
+   logging_srv.srv
+   gps_pos_srv.srv
+   utm_srv.srv
+   cont_log_srv.srv
  )
 
 ## Generate actions in the 'action' folder

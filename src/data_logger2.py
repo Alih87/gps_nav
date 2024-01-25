@@ -21,9 +21,9 @@ class logger_node(object):
 			return logging_srvResponse(True)
 		else:
 			return logging_srvResponse(False)
-		
+
 	def optim_sub(self):
-		rospy.init_node('data_logger')
+		rospy.init_node('data_logger2')
 		#get_logger_func = partial(log_data, fl)
 		lg_srv = rospy.Service('logg_srv', logging_srv, self.log_data)
 		rospy.sleep(0.01)
