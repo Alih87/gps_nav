@@ -163,7 +163,7 @@ class optimizer_node():
 		'''
 		Checks whether the current position is within 25 centimeters radius (at max).
 		'''
-		if ((self.x**2 + self.y**2)**0.5 > 0.42) and self.theta_done:
+		if ((self.x**2 + self.y**2)**0.5 > 0.55) and self.theta_done:
 			self.linear_done = False
 		elif self.theta_done and not self.linear_done:
 			self.linear_done = True
