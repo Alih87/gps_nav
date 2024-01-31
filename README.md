@@ -1,7 +1,7 @@
 Devices:
   GPS -> RTK2U
   Orientation -> UM7
-  Robot -> WeGo Robotics Scout Robot
+  Robot -> WeGo-ST Robotics Scout Robot
 
 ROS:
   version: ROS Melodic
