@@ -24,9 +24,13 @@
 
     <node name="waypt_service" pkg="gps_nav" type="wps_service.py"/>
     <node name="um7_dev" pkg="um7" type="um7_driver"/>
+    <!--<node name="sbg_device" pkg="sbg_driver" type="sbg_device">
+	<rosparam command="load" file="$(find sbg_driver)/config/sbg_device_uart_default.yaml" />
+    </node>
+    -->
     <node name="gps2_pub" pkg="gps_nav" type="gps2_pub.py"/>
     <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_.py" output="screen"/>
-    <node name="optimizer_node" pkg="gps_nav" type="optimizer.py" output="screen"/>
+    <node name="optimizer_node" pkg="gps_nav" type="optimizer.py"/>
     <node name="move_command" pkg="gps_nav" type="moveCmd.py"/>
     <node name="dest_pos_pub" pkg="gps_nav" type="get_final_dest.py"/>
     <node name="data_logging" pkg="gps_nav" type="data_logger.py"/>

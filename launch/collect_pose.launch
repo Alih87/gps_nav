@@ -1,0 +1,9 @@
+<launch>
+	<!--
+	<node name="sbg_device" pkg="sbg_driver" type="sbg_device" output="screen">
+		<rosparam command="load" file="$(find sbg_driver)/config/sbg_device_uart_default.yaml"/>
+	</node>
+	-->
+	<node name="um7_d" pkg="um7" type="um7_driver"/>
+	<node name="collector" pkg="gps_nav" type="collect_angles.py" output="screen"/>
+</launch>

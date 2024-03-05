@@ -2,6 +2,7 @@
 import time
 from collections import deque
 from struct import pack
+import serial
 
 class GPS(object):
 	def __init__(self, serial_port):
@@ -12,7 +13,7 @@ class GPS(object):
 		self.msgs = deque(maxlen=4)
 		self.has_head = False
 		self.end = "\r\n".encode()
-		self.frame_k = ['UTC_fix', 'lat', 'dir_lat', 'lon', 'dir_lon',
+		self.frame_k = ['UTC_fix', 'dir_lat', 'lat', 'dir_lon', 'lon',
 				 'gps_qty', 'num_SV', 'hdop', 'orth_height',
 				 'm_orth_height', 'geoid_sep', 'm_geoid_sep',
 				 'DGPS_age', 'refer_id', 'chksum']
@@ -22,42 +23,29 @@ class GPS(object):
 		Parse the incoming bytes into separate bytes.
 		'''
 		wait_idx = 0
-		try:
-			while True:
-				if self.port.inWaiting() > 0:
-					wait_idx = 0
-					self.buf += self.port.read()
-					#print(self.buf)
-					if self.has_head and "\r".encode() in self.buf:
-						self.msgs.append(self.buf[:-1])
-						self.buf = "".encode()
-						break
-					
-					if self.head in self.buf:
-						self.buf = "".encode()
-						self.has_head = True
-	
-					if len(self.buf) >= 999:
-						self.buf = "".encode()
-						break
-						
-					#if not (self.head in self.buf) and len(self.buf) >= len(self.head) and not found:
-					#	self.buf = "".encode()
-					#	return True
-					#if wait_idx >= 50:
-					#	self.buf = "".encode()
-					#	wait_idx = 0
-					#	return True
+		while True:
+			if self.port.inWaiting() > 0:
+				wait_idx = 0
+				self.buf += self.port.read()
+				#print(self.buf)
+				if self.head in self.buf:
+					self.buf = "".encode()
+					self.has_head = True
 
-				else:
-					wait_idx += 1
-					if wait_idx == 200000000:
-						wait_idx = 0
-						break
-				
-										
-		except KeyboardInterrupt:
-			print("\nExiting...\n")
+				if self.has_head and "\r".encode() in self.buf:
+					self.msgs.append(self.buf[:-1])
+					self.buf = "".encode()
+					break
+
+				if len(self.buf) >= 999:
+					self.buf = "".encode()
+					break
+
+			else:
+				wait_idx += 1
+				if wait_idx == 200000000:
+					wait_idx = 0
+					break
 
 	def parse(self):
 		if len(self.msgs) > 0:
@@ -73,25 +61,28 @@ class GPS(object):
 			return dict()
 
 
-#if __name__ == '__main__':
-#	CONNECTED = False
-#	for i in range(21):
-#		if i == 21 and not CONNECTED:
-#			print("\n[INFO] No Port found!\n")
-#			break
-#		try:
-#			serial_port = serial.Serial(
-#				port="/dev/ttyUSB"+str(i),
-#				baudrate=115200,
-#				bytesize=serial.EIGHTBITS,
-#				parity=serial.PARITY_NONE,
-#				stopbits=serial.STOPBITS_ONE
-#						   )
-#			print("\n[INFO] Connection established at port USB"+str(i))
-#			CONNECTED = True
-#			gps = GPS(serial_port)
-#			gps.read()
-#			print(gps.parse())
-#		except:
-#s			print('Here at '+str(i))
+if __name__ == '__main__':
+	CONNECTED = False
+	lat_lons = list()
+	try:
+		serial_port = serial.Serial(
+			port="/dev/ttyUSB1",
+			baudrate=115200,
+			bytesize=serial.EIGHTBITS,
+			parity=serial.PARITY_NONE,
+			stopbits=serial.STOPBITS_ONE
+					   )
+		CONNECTED = True
+		gps = GPS(serial_port)
+		while True:
+			gps.read()
+			loc_dict = gps.parse()
+			lat_lons.append((loc_dict['lat'], loc_dict['lon']))
+	except:
+		with open("/home/scout/Documents/sandesh_dynamic_test.txt", 'w') as f:
+			for lt, ln in lat_lons:
+				f.write(lt+","+ln+"\n")
+
+			f.close()
+		print("[INFO] Data saved.")
 

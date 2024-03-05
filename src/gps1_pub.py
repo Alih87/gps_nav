@@ -9,7 +9,7 @@ class gps1_node(object):
 		self.X, self.Y = 0, 0
 	def loc_pub(self, x, y):
 		rospy.init_node('dgps1', anonymous=False)
-		pub = rospy.Publisher('gps_pos1', latlon_gps, queue_size=10)
+		pub = rospy.Publisher('gps_pos1', latlon_gps, queue_size=1)
 		try:
 			self.X, self.Y = float(x)/100.0, float(y)/100.0
 		except:
@@ -19,7 +19,7 @@ class gps1_node(object):
 
 	def pub_port_num(self, port_num):
 		rospy.init_node('dgps1', anonymous=False)
-		pub = rospy.Publisher('port_num', heading_ang, queue_size=10)
+		pub = rospy.Publisher('port_num', heading_ang, queue_size=1)
 		pub.publish(port_num)
 		rospy.sleep(0.01)
 

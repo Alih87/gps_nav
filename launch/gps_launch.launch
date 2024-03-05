@@ -1,5 +1,4 @@
 <launch>
-
 	<node name="gps1_loc" pkg="gps_nav" type="gps1_pub.py"/>
 	<node name="gps2_loc" pkg="gps_nav" type="gps2_pub.py"/>
 	<node name="current_heading_pub" pkg="gps_nav" type="dual_heading_pub.py"/>
