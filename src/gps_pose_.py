@@ -18,7 +18,7 @@ class heading_KF(object):
 		self.mag_measure = 0
 		self.yaw_measure = 0
 		self.declination = -8.51667
-		self.MAX_LEN = 5
+		self.MAX_LEN = 4
 		
 		self.moving_avg = deque(maxlen=self.MAX_LEN)
 
@@ -28,9 +28,9 @@ class heading_KF(object):
 		self.A, self.B = array(([[1]]), ndmin=2), array(([[1]]), ndmin=2)
 
 	def get_mag_theta(self, data):
-		x = data.vector.x
-		y = data.vector.y
-		theta = -1*atan2(y,x)*(180/pi) + self.declination
+		x = data.mag.x
+		y = data.mag.y
+		theta = 1*atan2(y,x)*(180/pi) + self.declination
 		if abs(theta - self.prev_theta_mag) >= 20:
 			theta = self.prev_theta_mag
 		else:
@@ -39,7 +39,7 @@ class heading_KF(object):
 		self.theta_mag = sum(self.moving_avg)/self.MAX_LEN
 	
 	def get_yaw_theta(self, data):
-		self.theta_yaw = data.vector.z*(180/pi)
+		self.theta_yaw = -1*data.angle.z*(180/pi)
 
 	def get_scout_theta(self, data):
 		z = data.pose.pose.orientation.z
@@ -51,8 +51,8 @@ class heading_KF(object):
 	def get_initial_heading(self):
 		rospy.init_node('gps_pose', anonymous=False)
 		rospy.Subscriber('odom', Odometry, self.get_scout_theta)
-		rospy.Subscriber('/imu/mag', Vector3Stamped, self.get_mag_theta)
-		rospy.Subscriber('/imu/rpy', Vector3Stamped, self.get_yaw_theta)
+		rospy.Subscriber('/sbg/mag', SbgMag, self.get_mag_theta)
+		rospy.Subscriber('/sbg/ekf_euler', SbgEkfEuler, self.get_yaw_theta)
 		self.initial_heading = self.theta_mag
 		self.prev_theta_mag = self.initial_heading
 		self.moving_avg.extend([self.initial_heading]*self.MAX_LEN)
@@ -68,15 +68,15 @@ class heading_KF(object):
 	
 	def get_measurements(self):
 		rospy.init_node('gps_pose', anonymous=False)
-		rospy.Subscriber('/imu/mag', Vector3Stamped, self.get_mag_theta)
-		rospy.Subscriber('/imu/rpy', Vector3Stamped, self.get_yaw_theta)
+		rospy.Subscriber('/sbg/mag', SbgMag, self.get_mag_theta)
+		rospy.Subscriber('/sbg/ekf_euler', SbgEkfEuler, self.get_yaw_theta)
 		self.mag_measure, self.yaw_measure = self.theta_mag, self.theta_yaw + self.offset
 
 	def get_posteriori_est(self):
-		Q = random.normal(0, 0.7, 1)[0]
+		Q = random.normal(0, 0.3, 1)[0]
 		C = array(([[1],[1]]), ndmin=2)
 		R = array(([[random.normal(0, 1.959, 1)[0], 0],
-			    [0, 0.0]]))
+			    [0, 0.001]]))
 		last_K_ = array(([[0.5, 0.5]]), ndmin=2)
 
 		# Get priori estimate and predicted error covariance
