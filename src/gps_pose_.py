@@ -18,7 +18,7 @@ class heading_KF(object):
 		self.mag_measure = 0
 		self.yaw_measure = 0
 		self.declination = -8.51667
-		self.MAX_LEN = 4
+		self.MAX_LEN = 1
 		
 		self.moving_avg = deque(maxlen=self.MAX_LEN)
 
@@ -30,24 +30,28 @@ class heading_KF(object):
 	def get_mag_theta(self, data):
 		x = data.mag.x
 		y = data.mag.y
-		theta = 1*atan2(y,x)*(180/pi) + self.declination
-		if abs(theta - self.prev_theta_mag) >= 20:
-			theta = self.prev_theta_mag
-		else:
-			self.prev_theta_mag = theta
+		theta = 1*atan2(y,x)*(180/pi)
+		#theta = ((2*pi + theta)*(theta<0) + theta*(theta>0))*(180/pi) + self.declination
+		#if abs(theta - self.prev_theta_mag) >= 190:
+		#	theta = self.prev_theta_mag
+		#	theta = (theta + 180) % 360 - 180
+		#else:
+		#	self.prev_theta_mag = theta
 		self.moving_avg.append(theta)
 		self.theta_mag = sum(self.moving_avg)/self.MAX_LEN
 	
 	def get_yaw_theta(self, data):
 		self.theta_yaw = -1*data.angle.z*(180/pi)
+		#self.theta_yaw = ((2*pi+self.theta_yaw)*(self.theta_yaw < 0) + self.theta_yaw*(self.theta_yaw > 0))*(180/pi)
 
 	def get_scout_theta(self, data):
 		z = data.pose.pose.orientation.z
 		w = data.pose.pose.orientation.w
 		self.theta_scout = atan2(2.0*(w*z), 1.0-2.0*(z*z))*(180/pi)
+		#self.theta_scout = ((2*pi+self.theta_scout)*(self.theta_scout < 0) + self.theta_scout*(self.theta_scout > 0))*(180/pi)
 		self.delta_theta = self.theta_scout-self.prev_theta_scout
 		self.prev_theta_scout = self.theta_scout
-	
+
 	def get_initial_heading(self):
 		rospy.init_node('gps_pose', anonymous=False)
 		rospy.Subscriber('odom', Odometry, self.get_scout_theta)
@@ -65,15 +69,17 @@ class heading_KF(object):
 		rospy.init_node('gps_pose', anonymous=False)
 		rospy.Subscriber('odom', Odometry, self.get_scout_theta)
 		self.priori_est = matmul(self.A, array(([[self.theta_scout + self.initial_heading]]), ndmin=2)) + matmul(self.B, array(([[self.delta_theta]]), ndmin=2))
+		self.priori_est = (self.priori_est + 180) % 360 - 180
 	
 	def get_measurements(self):
 		rospy.init_node('gps_pose', anonymous=False)
 		rospy.Subscriber('/sbg/mag', SbgMag, self.get_mag_theta)
 		rospy.Subscriber('/sbg/ekf_euler', SbgEkfEuler, self.get_yaw_theta)
 		self.mag_measure, self.yaw_measure = self.theta_mag, self.theta_yaw + self.offset
+		self.mag_measure, self.yaw_measure = (self.mag_measure + 180) % 360 - 180, (self.yaw_measure + 180) % 360 - 180
 
 	def get_posteriori_est(self):
-		Q = random.normal(0, 0.3, 1)[0]
+		Q = random.normal(0, 0.7, 1)[0]
 		C = array(([[1],[1]]), ndmin=2)
 		R = array(([[random.normal(0, 1.959, 1)[0], 0],
 			    [0, 0.001]]))
@@ -86,8 +92,12 @@ class heading_KF(object):
 		# Update using measurements
 		K_ = matmul(matmul(P_, C.T), linalg.inv(matmul(C, matmul(P_, C.T)) + R))
 		self.get_measurements()
-		y = array(([[self.mag_measure],[self.yaw_measure]]), ndmin=2)		
-		self.post_est = self.priori_est - matmul(K_,(y - matmul(C, self.priori_est)))
+		y = array(([[self.mag_measure],[self.yaw_measure]]), ndmin=2)
+		if self.priori_est - matmul(K_,(y - matmul(C, self.priori_est))) > 185 or self.priori_est - matmul(K_,(y - matmul(C, self.priori_est))) < -185:
+			self.post_est += self.delta_theta
+		else:	
+			self.post_est = self.priori_est - matmul(K_,(y - matmul(C, self.priori_est)))
+		self.post_est = (self.post_est + 180) % 360 - 180
 		self.P = matmul((array([[1]],ndmin=2) - matmul(K_, C)), P_)
 		#self.priori_est = self.post_est
 
