@@ -28,9 +28,9 @@ class heading_KF(object):
 		self.A, self.B = array(([[1]]), ndmin=2), array(([[1]]), ndmin=2)
 
 	def get_mag_theta(self, data):
-		x = data.mag.x
-		y = data.mag.y
-		theta = 1*atan2(y,x)*(180/pi)
+		x = data.vector.x
+		y = data.vector.y
+		theta = -1*atan2(y,x)*(180/pi)
 		#theta = ((2*pi + theta)*(theta<0) + theta*(theta>0))*(180/pi) + self.declination
 		#if abs(theta - self.prev_theta_mag) >= 190:
 		#	theta = self.prev_theta_mag
@@ -41,7 +41,7 @@ class heading_KF(object):
 		self.theta_mag = sum(self.moving_avg)/self.MAX_LEN
 	
 	def get_yaw_theta(self, data):
-		self.theta_yaw = -1*data.angle.z*(180/pi)
+		self.theta_yaw = 1*data.vector.z*(180/pi)
 		#self.theta_yaw = ((2*pi+self.theta_yaw)*(self.theta_yaw < 0) + self.theta_yaw*(self.theta_yaw > 0))*(180/pi)
 
 	def get_scout_theta(self, data):
@@ -55,8 +55,8 @@ class heading_KF(object):
 	def get_initial_heading(self):
 		rospy.init_node('gps_pose', anonymous=False)
 		rospy.Subscriber('odom', Odometry, self.get_scout_theta)
-		rospy.Subscriber('/sbg/mag', SbgMag, self.get_mag_theta)
-		rospy.Subscriber('/sbg/ekf_euler', SbgEkfEuler, self.get_yaw_theta)
+		rospy.Subscriber('/imu/mag', Vector3Stamped, self.get_mag_theta)
+		rospy.Subscriber('/imu/rpy', Vector3Stamped, self.get_yaw_theta)
 		self.initial_heading = self.theta_mag
 		self.prev_theta_mag = self.initial_heading
 		self.moving_avg.extend([self.initial_heading]*self.MAX_LEN)
@@ -73,8 +73,8 @@ class heading_KF(object):
 	
 	def get_measurements(self):
 		rospy.init_node('gps_pose', anonymous=False)
-		rospy.Subscriber('/sbg/mag', SbgMag, self.get_mag_theta)
-		rospy.Subscriber('/sbg/ekf_euler', SbgEkfEuler, self.get_yaw_theta)
+		rospy.Subscriber('/imu/mag', Vector3Stamped, self.get_mag_theta)
+		rospy.Subscriber('/imu/rpy', Vector3Stamped, self.get_yaw_theta)
 		self.mag_measure, self.yaw_measure = self.theta_mag, self.theta_yaw + self.offset
 		self.mag_measure, self.yaw_measure = (self.mag_measure + 180) % 360 - 180, (self.yaw_measure + 180) % 360 - 180
 
@@ -227,8 +227,8 @@ if __name__== '__main__':
 	     # Using Scout Odometer
 		# odom_sub()
 		# odom_pub()
-	with open("/home/scout/boat_data/sbg_kf_angles.txt", 'w') as f:
-		for i,j,w,k in zip(gps_pose_obj.yaws, gps_pose_obj.mags, gps_pose_obj.prioris, gps_pose_obj.posts):
-			f.write(str(i)+","+str(j)+","+str(w)+","+str(k)+"\n")
-		f.close()
+	#with open("/home/scout/boat_data/sbg_kf_angles.txt", 'w') as f:
+	#	for i,j,w,k in zip(gps_pose_obj.yaws, gps_pose_obj.mags, gps_pose_obj.prioris, gps_pose_obj.posts):
+	#		f.write(str(i)+","+str(j)+","+str(w)+","+str(k)+"\n")
+	#	f.close()
 

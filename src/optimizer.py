@@ -143,7 +143,7 @@ class optimizer_node():
 		self.x = self.dest_x - self.curr_x
 		self.y = self.dest_y - self.curr_y
 
-		self.theta = ((self.calculate_angle2(self.x, self.y)) - self.curr_theta)
+		self.theta = ((self.calculate_angle2(self.x, self.y) - 90) - self.curr_theta)
 		if self.theta > 180:
 			self.theta = self.theta - 359
 		elif self.theta < -180:

@@ -71,7 +71,7 @@ if __name__ == '__main__':
 			if len(list(frame.keys())) == 0:
 				break
 			#gps2_obj.loc_pub(frame['dir_lat'], frame['dir_lon'])
-			gps2_obj.loc_pub_srv(frame['dir_lat'], frame['dir_lon'])
+			gps2_obj.loc_pub_srv(frame['lat'], frame['lon'])
 			
 
 		

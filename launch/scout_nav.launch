@@ -23,10 +23,10 @@
     <!--<node name="gps1_pub" pkg="gps_nav" type="gps1_pub.py"/>-->
 
     <node name="waypt_service" pkg="gps_nav" type="wps_service.py"/>
-    <!--<node name="um7_dev" pkg="um7" type="um7_driver"/>-->
-    <node name="sbg_device" pkg="sbg_driver" type="sbg_device">
+    <node name="um7_dev" pkg="um7" type="um7_driver"/>
+    <!--<node name="sbg_device" pkg="sbg_driver" type="sbg_device">
 	<rosparam command="load" file="$(find sbg_driver)/config/sbg_device_uart_default.yaml" />
-    </node>
+    </node>-->
 
     <node name="gps2_pub" pkg="gps_nav" type="gps2_pub.py"/>
     <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_.py" output="screen"/>
