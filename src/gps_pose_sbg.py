@@ -30,7 +30,7 @@ class heading_KF(object):
 	def get_mag_theta(self, data):
 		x = data.mag.x
 		y = data.mag.y
-		theta = -1*atan2(y,x)*(180/pi)
+		theta = 1*atan2(y,x)*(180/pi)
 		#theta = ((2*pi + theta)*(theta<0) + theta*(theta>0))*(180/pi) + self.declination
 		#if abs(theta - self.prev_theta_mag) >= 190:
 		#	theta = self.prev_theta_mag
@@ -41,7 +41,7 @@ class heading_KF(object):
 		self.theta_mag = sum(self.moving_avg)/self.MAX_LEN
 	
 	def get_yaw_theta(self, data):
-		self.theta_yaw = 1*data.angle.z*(180/pi)
+		self.theta_yaw = -1*data.angle.z*(180/pi)
 		#self.theta_yaw = ((2*pi+self.theta_yaw)*(self.theta_yaw < 0) + self.theta_yaw*(self.theta_yaw > 0))*(180/pi)
 
 	def get_scout_theta(self, data):
