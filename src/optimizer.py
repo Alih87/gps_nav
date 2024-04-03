@@ -51,6 +51,7 @@ class optimizer_node():
 		self.dest_x, self.dest_y, self.dest_theta = 0, 0, 0
 		self.x, self.y, self.theta = 0, 0, 0
 		self.collect_data = collect_data
+		self.last_dest, self.strikes = 0, 0
 
 	def calculate_angle(self, y, x):
 		if x > 0:
@@ -161,10 +162,18 @@ class optimizer_node():
 				raise Exception("[INFO] False response from Optimizer Service.")
 
 		'''
-		Checks whether the current position is within 25 centimeters radius (at max).
+		Checks whether the current position is within 55 centimeters radius (at max).
 		'''
-		if ((self.x**2 + self.y**2)**0.5 > 0.55) and self.theta_done:
+		if ((self.x**2 + self.y**2)**0.5 > 0.55) and self.theta_done and not self.linear_done:
 			self.linear_done = False
+			self.last_dest = (self.x**2 + self.y**2)**0.5
+			if ((self.x**2 + self.y**2)**0.5 > 0.55) < self.last_dest:
+				pass
+			elif self.strikes == 20:
+				self.linear_done = True	
+			else:
+				self.strikes += 1
+			
 		elif self.theta_done and not self.linear_done:
 			self.linear_done = True
 			resp = pub(self.x, self.y, self.theta, self.theta_done, self.linear_done)

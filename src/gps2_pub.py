@@ -20,13 +20,13 @@ class gps2_node(object):
 
 	def loc_pub_srv(self, x, y):
 		rospy.init_node('dgps2', anonymous=False)
-		rospy.wait_for_service('gps_pos_srv')
-		p = rospy.ServiceProxy('gps_pos_srv', gps_pos_srv)
+		rospy.wait_for_service('gps_pos_srv2')
+		p = rospy.ServiceProxy('gps_pos_srv2', gps_pos_srv)
 		try:
-			X, Y = float(x)/100.0, float(y)/100.0
+			self.X, self.Y = float(x)/100.0, float(y)/100.0
 		except:
-			X, Y = 0, 0
-		resp = p(X,Y)
+			self.X, self.Y = 0, 0
+		resp = p(self.X,self.Y)
 		if not resp.done:
 			raise Exception("[INFO] False response from gps_pos Service.")
 		rospy.sleep(0.001)
@@ -72,7 +72,6 @@ if __name__ == '__main__':
 				break
 			#gps2_obj.loc_pub(frame['dir_lat'], frame['dir_lon'])
 			gps2_obj.loc_pub_srv(frame['lat'], frame['lon'])
-			
 
 		
 	except:

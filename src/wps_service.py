@@ -49,7 +49,7 @@ if __name__ == '__main__':
 	wp_data.wps_server()
 	while not rospy.is_shutdown():
 		wp_data.cont_logging()
-		rospy.sleep(1)
+		rospy.sleep(0.01)
 	with open(logs_path+"NAV_LOG_"+dt+"_CONT.txt", "w") as f:
 		for line in wp_data.content:
 			f.write(line)
