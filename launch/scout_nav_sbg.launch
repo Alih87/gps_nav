@@ -29,7 +29,7 @@
     </node>
 
     <node name="gps2_pub" pkg="gps_nav" type="gps2_pub.py"/>
-    <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_.py" output="screen"/>
+    <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_sbg.py" output="screen"/>
     <node name="optimizer_node" pkg="gps_nav" type="optimizer.py"/>
     <node name="move_command" pkg="gps_nav" type="moveCmd.py"/>
     <node name="dest_pos_pub" pkg="gps_nav" type="get_final_dest.py"/>
