@@ -113,18 +113,7 @@ class gps_pose_node(object):
 if __name__== '__main__':
     gps_pose_obj = gps_pose_node(is_scout=False, scout_odom=False, imu_ros=True)
     print("[ INFO] Initialized GPS and Heading Node.")
-    #gps_pose_obj.gps_sub_Service()
     while not rospy.is_shutdown():
 	print("Current Position", gps_pose_obj.X, gps_pose_obj.Y, gps_pose_obj.HEADING)
-        #gps_pose_obj.gps_sub()
-        #gps_pose_obj.mag_sub()
-        #gps_pose_obj.utm_pub()
 	gps_pose_obj.utm_pub_srv()
-	     # Using Scout Odometer
-		# odom_sub()
-		# odom_pub()
-	#with open("/home/scout/boat_data/sbg_kf_angles.txt", 'w') as f:
-	#	for i,j,w,k in zip(gps_pose_obj.yaws, gps_pose_obj.mags, gps_pose_obj.prioris, gps_pose_obj.posts):
-	#		f.write(str(i)+","+str(j)+","+str(w)+","+str(k)+"\n")
-	#	f.close()
 

@@ -188,7 +188,7 @@ class gps_pose_node(object):
 
     def gps_sub_Service(self):
 	rospy.init_node('gps_pose', anonymous=False)
-	gps_srv = rospy.Service('gps_pos_srv', gps_pos_srv, self.get_utm_srv)
+	gps_srv = rospy.Service('gps_pos_srv2', gps_pos_srv, self.get_utm_srv)
 
     def mag_sub(self):
         rospy.init_node('gps_pose', anonymous=False)
@@ -227,8 +227,8 @@ if __name__== '__main__':
 	     # Using Scout Odometer
 		# odom_sub()
 		# odom_pub()
-	#with open("/home/scout/boat_data/sbg_kf_angles.txt", 'w') as f:
-	#	for i,j,w,k in zip(gps_pose_obj.yaws, gps_pose_obj.mags, gps_pose_obj.prioris, gps_pose_obj.posts):
-	#		f.write(str(i)+","+str(j)+","+str(w)+","+str(k)+"\n")
-	#	f.close()
+	with open("/home/scout/boat_data/sbg_kf_angles.txt", 'w') as f:
+		for i,j,w,k in zip(gps_pose_obj.yaws, gps_pose_obj.mags, gps_pose_obj.prioris, gps_pose_obj.posts):
+			f.write(str(i)+","+str(j)+","+str(w)+","+str(k)+"\n")
+		f.close()
 

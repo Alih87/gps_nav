@@ -23,7 +23,8 @@ class gps2_node(object):
 		rospy.wait_for_service('gps_pos_srv2')
 		p = rospy.ServiceProxy('gps_pos_srv2', gps_pos_srv)
 		try:
-			self.X, self.Y = float(x)/100.0, float(y)/100.0
+			self.X, self.Y = (float(x)//100.0)+(float(x)%100)/60, (float(y)//100.0)+(float(y)%100)/60
+			#self.X, self.Y = float(x)/100.0, float(y)/100.0
 		except:
 			self.X, self.Y = 0, 0
 		resp = p(self.X,self.Y)
@@ -63,14 +64,14 @@ if __name__ == '__main__':
 			pass
 		else:
 			gps = GPS(serial_port)
-			sys.stdout.write("\n[INFO] Connection established at port USB1"+"\n")
+			sys.stdout.write("[INFO] Connection established with GPS2 at port USB1"+"\n")
 
 		while not rospy.is_shutdown():
 			ret = gps.read()
 			frame = gps.parse()
 			if len(list(frame.keys())) == 0:
 				break
-			#gps2_obj.loc_pub(frame['dir_lat'], frame['dir_lon'])
+			#gps2_obj.loc_pub(frame['lat'], frame['lon'])
 			gps2_obj.loc_pub_srv(frame['lat'], frame['lon'])
 
 		

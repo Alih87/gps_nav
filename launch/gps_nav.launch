@@ -1,5 +1,7 @@
 <launch>
-	<node name="sbg_device" pkg="sbg_driver" type="sbg_device" output="screen">
-		<rosparam command="load" file="$(find sbg_driver)/config/sbg_device_uart_default.yaml" />
-	</node>
+	<!--<node name="current_heading_pub" pkg="gps_nav" type="dual_heading_pub.py">-->
+	<node name="gps1_loc" pkg="gps_nav" type="gps1_pub.py" output="screen"/>
+	<!--<node name="gps2_loc" pkg="gps_nav" type="gps2_pub.py" output="screen"/>-->
+	<node name="waypt_service" pkg="gps_nav" type="wps_service.py"/>
+	<node name="direct_logger" pkg="gps_nav" type="direct_logging.py"/>
 </launch>
