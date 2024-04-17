@@ -30,17 +30,20 @@ class send_wp_data():
 			return wps_srvResponse(self.X, self.Y, self.Theta)
 
 	def wps_server(self):
-		rospy.init_node('wps_service')
+		#rospy.init_node('wps_service')
 		s = rospy.Service('wps_srv', wps_srv, self.handle_wps_req)
 
 	def cont_logging(self):
-		rospy.init_node('wps_service')
+		#rospy.init_node('wps_service')
 		rospy.wait_for_service('cont_log')
 		lg = rospy.ServiceProxy('cont_log', cont_log_srv)
 		resp = lg(True)
 		self.content.append(str(resp.x)+","+str(resp.y)+"\n")
 
 if __name__ == '__main__':
+	rospy.init_node('wps_service')
+	rate = rospy.Rate(10)	# 5 Hz
+	rospy.sleep(1)
 	dt = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M:%S")
 	home_dir = os.environ['HOME']
 	path = home_dir + "/boat_data/wps/wp_data.txt"
@@ -49,7 +52,8 @@ if __name__ == '__main__':
 	wp_data.wps_server()
 	while not rospy.is_shutdown():
 		wp_data.cont_logging()
-		rospy.sleep(0.17)
+		#rospy.sleep(0.17)
+		rate.sleep()
 	with open(logs_path+"NAV_LOG_"+dt+"_CONT.txt", "w") as f:
 		for line in wp_data.content:
 			f.write(line)

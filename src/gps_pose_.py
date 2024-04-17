@@ -100,7 +100,7 @@ class gps_pose_node(object):
         rospy.init_node('gps_pose', anonymous=False)
         pub = rospy.Publisher('odom_pose', coordinates, queue_size=1)
         pub.publish(self.X,self.Y,self.HEADING)
-	rospy.sleep(0.025)
+	#rospy.sleep(0.025)
 
     def utm_pub_srv(self):
 	rospy.init_node('gps_pose', anonymous=False)

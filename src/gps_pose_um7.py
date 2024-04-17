@@ -126,6 +126,15 @@ class gps_pose_node(object):
         #self.X, self.Y = self.X - self.CENTER[0], self.Y - self.CENTER[1]
         #self.X, self.Y = self.X, self.Y
         #ZONE = str(zo)+ne
+	self.kf_obj.get_posteriori_est()
+	self.yaws.append(self.kf_obj.yaw_measure)
+	self.mags.append(self.kf_obj.mag_measure)			
+	self.prioris.append(self.kf_obj.priori_est[0][0])
+	#print(self.kf_obj.mag_measure)
+	#print(self.kf_obj.theta_yaw)
+	#print(self.kf_obj.theta_scout)
+	self.HEADING = self.kf_obj.post_est[0][0]
+	self.posts.append(self.HEADING)
 
     def get_utm_srv(self, req):
 	if not self.scout_odom:
@@ -203,7 +212,7 @@ class gps_pose_node(object):
         rospy.init_node('gps_pose', anonymous=False)
         pub = rospy.Publisher('odom_pose', coordinates, queue_size=1)
         pub.publish(self.X,self.Y,self.HEADING)
-	rospy.sleep(0.025)
+	#rospy.sleep(0.025)
 
     def utm_pub_srv(self):
 	rospy.init_node('gps_pose', anonymous=False)
@@ -214,6 +223,7 @@ class gps_pose_node(object):
 		raise Exception("[INFO] False response from utm publishing Service.")
 		
 if __name__== '__main__':
+    rate = rospy.Rate(10)  #10 Hz
     kf_obj = heading_KF()
     gps_pose_obj = gps_pose_node(kf_obj, is_scout=False, scout_odom=False, imu_ros=True)
     print("[ INFO] Initialized GPS and Heading Node.")
@@ -222,8 +232,8 @@ if __name__== '__main__':
 	print("Current Position", gps_pose_obj.X, gps_pose_obj.Y, gps_pose_obj.HEADING)
         #gps_pose_obj.gps_sub()
         #gps_pose_obj.mag_sub()
-        #gps_pose_obj.utm_pub()
-	gps_pose_obj.utm_pub_srv()
+        gps_pose_obj.utm_pub()
+	#gps_pose_obj.utm_pub_srv()
 	     # Using Scout Odometer
 		# odom_sub()
 		# odom_pub()
@@ -231,4 +241,6 @@ if __name__== '__main__':
 		for i,j,w,k in zip(gps_pose_obj.yaws, gps_pose_obj.mags, gps_pose_obj.prioris, gps_pose_obj.posts):
 			f.write(str(i)+","+str(j)+","+str(w)+","+str(k)+"\n")
 		f.close()
+
+	rate.sleep()
 
