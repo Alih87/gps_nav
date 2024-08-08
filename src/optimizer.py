@@ -5,6 +5,7 @@ from gps_nav.srv import flag_srv, feedback_srv, logging_srv, final_pos_srv, utm_
 from gps_nav.msg import coordinates, pose_xy, flag
 #from sbg_driver.msg import SbgGpsPos, SbgMag
 from math import atan, atan2, pi
+import tf, math
 
 ############### USING SCOUT ODOMETER #####################
 
@@ -52,6 +53,31 @@ class optimizer_node():
 		self.x, self.y, self.theta = 0, 0, 0
 		self.collect_data = collect_data
 		self.last_dest, self.strikes = 0, 0
+		self.trans, self.rot = 0, 0
+
+	def euler_from_quaternion(self, x, y, z, w):
+		t0 = +2.0 * (w * x + y * z)
+		t1 = +1.0 - 2.0 * (x * x + y * y)
+		roll_x = math.atan2(t0, t1)
+
+		t2 = +2.0 * (w * y - z * x)
+		t2 = +1.0 if t2 > +1.0 else t2
+		t2 = -1.0 if t2 < -1.0 else t2
+		pitch_y = math.asin(t2)
+
+		t3 = +2.0 * (w * z + x * y)
+		t4 = +1.0 - 2.0 * (y * y + z * z)
+		yaw_z = math.atan2(t3, t4)
+
+		return yaw_z * (180/math.pi)
+
+	def dest_listener(self):
+		dest_l = tf.TransformListener()
+		try:
+			self.trans, self.rot = dest_l.lookupTransform('destination', 'scout', rospy.Time(0))
+			self.x, self.y, self.theta = self.trans[0], self.trans[1], self.euler_from_quaternion(*self.rot)
+		except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+			pass
 
 	def calculate_angle(self, y, x):
 		if x > 0:
@@ -104,9 +130,9 @@ class optimizer_node():
 		rcv = True
 		if rcv:
 			rcv = True
-			return  utm_srvResponse(True)
+			return utm_srvResponse(True)
 		else:
-			return  utm_srvResponse(False)
+			return utm_srvResponse(False)
 
 	def get_dest_pose(self):
 		rospy.init_node('optimizer', anonymous=False)
@@ -141,8 +167,8 @@ class optimizer_node():
 		rospy.wait_for_service('feedback_srv')
 		pub = rospy.ServiceProxy('feedback_srv', feedback_srv)
 
-		self.x = self.dest_x - self.curr_x
-		self.y = self.dest_y - self.curr_y
+		# self.x = self.dest_x - self.curr_x
+		# self.y = self.dest_y - self.curr_y
 
 		self.theta = ((self.calculate_angle2(self.x, self.y) - 90) - self.curr_theta)
 		if self.theta > 180:

@@ -33,7 +33,7 @@ if __name__ == '__main__':
 	dt = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M:%S")
 	print("\n[INFO] Collecting Navigation data ...")
 	logger.optim_sub()
-	rate = rospy.Rate(0.99)
+	rate = rospy.Rate(7)
 	while not rospy.is_shutdown():
 		rate.sleep()
 	with open(logs_path + "NAV_LOG_"+dt+".txt", "w") as f:

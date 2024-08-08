@@ -3,7 +3,7 @@ import os, sys
 import  numpy as np
 import matplotlib.pyplot as plt
 
-DATA_PATH = r"/home/scout/boat_data/cont/NAV_LOG_2024_04_17_10_57:15_CONT.txt"
+DATA_PATH = r"/home/scout/boat_data/cont/CONT_LOG_2024_08_08_01_26:40.txt"
 
 #fls = os.listdir(DATA_PATH)
 files = []
@@ -13,7 +13,7 @@ with open(DATA_PATH) as f:
 	lines = f.readlines()
 	line = [l.splitlines() for l in lines]
 	for l in line:
-		x, y = l[0].split(',')
+		x, y, _ = l[0].split(',')
 		if x=="0.0" or y=="0.0":
 			pass
 		else:

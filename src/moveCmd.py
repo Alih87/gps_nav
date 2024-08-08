@@ -10,7 +10,7 @@ from geometry_msgs.msg import Twist
 
 class move_node(object):
 	def __init__(self):
-		self.TOP_LINEAR_SPEED = 0.15
+		self.TOP_LINEAR_SPEED = 0.45
 		self.TOP_ANGULAR_SPEED = 0.15
 		self.linear_spd = 0.11
 		self.angular_spd = 0.11

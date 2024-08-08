@@ -1,5 +1,5 @@
 <launch>
-
+    <param name="use_sim_time" value="false"/>
     <arg name="port_name" value="can0"/>
     <arg name="simulated_robot" value="false"/>
     <arg name="model_xacro" default="$(find scout_description)/urdf/scout_v2.xacro"/>
@@ -14,24 +14,31 @@
         <arg name="odom_topic_name" default="$(arg odom_topic_name)"/>
 	<arg name="pub_tf" default="$(arg pub_tf)"/>
     </include>
-    <!--
-    <include file="$(find scout_description)/launch/description.launch">
-        <arg name="model_xacro" default="$(arg model_xacro)"/>
-    </include>
-    -->
-    <!--<node name="current_heading_pub" pkg="gps_nav" type="dual_heading.py"/>-->
-    <!--<node name="gps1_pub" pkg="gps_nav" type="gps1_pub.py"/>-->
 
-    <node name="waypt_service" pkg="gps_nav" type="wps_service.py"/>
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization">
+    <rosparam command="load" file="$(find robot_localization)/params/ekf_template.yaml" />
+    </node>
+
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization1">
+    <rosparam command="load" file="$(find robot_localization)/params/ekf_template1.yaml" />
+    </node>
+
+    <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node">
+    <rosparam command="load" file="$(find robot_localization)/params/navsat_transform_template.yaml" />
+      <remap from="/gps/fix" to="/ublox/fix"/>
+    </node>
+   
+    <!-- <include file="$(find robot_localization)/launch/dual_ekf_navsat_example.launch"/> -->
+
+    <node name="base_to_gps_broadcaster" pkg="tf" type="static_transform_publisher" args="0.1 0 0.1 0 0 0 base_link gps 30"/>
+    <node name="base_to_imu_broadcaster" pkg="tf" type="static_transform_publisher" args="0.1 0 0.1 0 0 0 base_link imu_link 30"/>
+
     <node name="um7_dev" pkg="um7" type="um7_driver"/>
-    <!--<node name="sbg_device" pkg="sbg_driver" type="sbg_device">
-	<rosparam command="load" file="$(find sbg_driver)/config/sbg_device_uart_default.yaml" />
-    </node>-->
-
-    <node name="gps2_pub" pkg="gps_nav" type="gps2_pub.py" output="screen"/>
-    <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_um7.py" output="screen"/>
-    <node name="optimizer_node" pkg="gps_nav" type="optimizer.py"/>
-    <node name="move_command" pkg="gps_nav" type="moveCmd.py"/>
+    <include file="$(find imu_filter_madgwick)/launch/imu_filter_madgwick.launch"/>
+    <node name="waypt_service" pkg="gps_nav" type="wps_service.py"/>
+    <node name="optimizer_node" pkg="gps_nav" type="optimizer2.py"/>
+    <include file="$(find ublox_gps)/launch/ublox_device.launch"/>
+    <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_um7_2.py" output="screen"/>
     <node name="dest_pos_pub" pkg="gps_nav" type="get_final_dest.py"/>
     <node name="data_logging" pkg="gps_nav" type="data_logger.py"/>
 
@@ -42,4 +49,3 @@
     -->
 
 </launch>
-
