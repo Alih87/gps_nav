@@ -124,12 +124,12 @@ class optimizer_node():
 
 		self.x = self.dest_x - self.curr_x
 		self.y = self.dest_y - self.curr_y
-		tgt_theta = self.calculate_angle2(self.x, self.y) + 90
-		if tgt_theta > 180:
-			tgt_theta =- 360
+		tgt_theta = self.calculate_angle2(self.x, self.y)
+		# if tgt_theta > 180:
+		# 	tgt_theta =- 360
 		# if tgt_theta < -180:
 		# 	tgt_theta += 360
-		self.theta = tgt_theta - self.curr_theta
+		self.theta = tgt_theta - self.curr_theta - 90
 		if self.theta < 0:
 			self.theta += 360
 		# if abs(self.theta) > 180:
@@ -138,8 +138,8 @@ class optimizer_node():
 		# 	self.theta = 360 + self.theta
 		# if self.theta > 359:
 		# 	self.theta = self.theta % 360
-		print(self.curr_theta, tgt_theta, self.theta)
-		# print(self.curr_x, self.curr_y)
+		# print(self.curr_theta, tgt_theta, self.theta)
+		print(self.x, self.y, self.theta)
 
 
 		'''
