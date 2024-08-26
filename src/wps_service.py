@@ -50,7 +50,7 @@ if __name__ == '__main__':
 	wp_data = send_wp_data(path)
 	wp_data.wps_server()
 	while not rospy.is_shutdown():
-		wp_data.cont_logging()
+		# wp_data.cont_logging()
 		#rospy.sleep(0.17)
 		rate.sleep()
 	# with open(logs_path+"NAV_LOG_"+dt+"_CONT.txt", "w") as f:

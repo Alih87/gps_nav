@@ -3,7 +3,7 @@ import os, sys
 import  numpy as np
 import matplotlib.pyplot as plt
 
-DATA_PATH = r"/home/scout/boat_data/cont/CONT_LOG_2024_08_08_01_26:40.txt"
+DATA_PATH = r"/home/scout/boat_data/cont/CONT_LOG_2024_08_21_20_16:39.txt"
 
 #fls = os.listdir(DATA_PATH)
 files = []

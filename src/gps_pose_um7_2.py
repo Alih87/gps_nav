@@ -42,7 +42,7 @@ class gps_pose_node(object):
 		if angle < 0:
 			return 360+angle
 		return angle
-	
+
 	def euler_from_quaternion(self, x, y, z, w):
 		t0 = +2.0 * (w * x + y * z)
 		t1 = +1.0 - 2.0 * (x * x + y * y)
@@ -60,27 +60,34 @@ class gps_pose_node(object):
 		return yaw_z * (180/math.pi)
 
 	def lookup_trans(self):
-		# try:
-		# 	self.dest_l.waitForTransform("destination", "scout", rospy.Time(0), rospy.Duration(10))
-		# 	self.trans, self.rot = self.dest_l.lookupTransform('destination', 'scout', rospy.Time(0))
-		# 	self.x, self.y, self.theta = self.trans[0], self.trans[1], self.euler_from_quaternion(*self.rot)
-		# 	self.theta = self.to_2pi(self.theta)
-		# 	print(self.trans, self.rot)
-		# except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-		# 	pass
 		if self.buf.can_transform('utm', 'base_link', rospy.Time(0), rospy.Duration(2)):
 			trans = self.buf.lookup_transform('utm', 'base_link', rospy.Time())
 			self.X = trans.transform.translation.x
 			self.Y = trans.transform.translation.y
+			# rx = trans.transform.rotation.x
+			# ry = trans.transform.rotation.y
+			# rz = trans.transform.rotation.z
+			# rw = trans.transform.rotation.w
+			# self.HEADING = self.euler_from_quaternion(*[rx,ry,rz,rw])
+			# self.utm_pub_srv()
+		else:
+			rospy.logdebug("Can't Transform")
+			# self.utm_pub_srv()
+
+	def lookup_rot(self):
+		if self.buf.can_transform('imu_link', 'base_link', rospy.Time(0), rospy.Duration(2)):
+			trans = self.buf.lookup_transform('imu_link', 'base_link', rospy.Time())
+			# self.X = trans.transform.translation.x
+			# self.Y = trans.transform.translation.y
 			rx = trans.transform.rotation.x
 			ry = trans.transform.rotation.y
 			rz = trans.transform.rotation.z
 			rw = trans.transform.rotation.w
 			self.HEADING = self.euler_from_quaternion(*[rx,ry,rz,rw])
-			# print(self.x, self.y, self.theta)
+			# self.utm_pub_srv()
 		else:
 			rospy.logdebug("Can't Transform")
-
+			# self.utm_pub_srv()
 
 	def get_utm(self, data):
 		self.lat, self.long = data.latitude, data.longitude
@@ -177,12 +184,13 @@ if __name__== '__main__':
 	# gps_pose_obj.gps_sub_Service()
 	with open(home_dir+"/boat_data/cont/CONT_LOG_"+dt+".txt", 'w') as f:
 		while not rospy.is_shutdown():
+			gps_pose_obj.utm_pub_srv()
 			# print("Current Position", gps_pose_obj.X, gps_pose_obj.Y, gps_pose_obj.HEADING)
 			# gps_pose_obj.gps_sub()
 			gps_pose_obj.lookup_trans()
+			gps_pose_obj.lookup_rot()
 			# gps_pose_obj.mag_sub()
 			# gps_pose_obj.utm_pub()
-			#gps_pose_obj.utm_pub_srv()
 			# Using Scout Odometer
 			# odom_sub()
 			# odom_pub()

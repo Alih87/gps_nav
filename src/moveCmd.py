@@ -14,6 +14,7 @@ class move_node(object):
 		self.TOP_ANGULAR_SPEED = 0.15
 		self.linear_spd = 0.11
 		self.angular_spd = 0.11
+		self.T = Twist()
 		#self.flag_grt, self.flag_sml = False, False
 		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = 0, 0, 0, False, False
 
@@ -33,7 +34,6 @@ class move_node(object):
 		return angle
 
 	def scout_ctrl_command(self):
-		T = Twist()
 		rospy.init_node('scout_ctrl', anonymous=False)
 		pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
 
@@ -42,33 +42,32 @@ class move_node(object):
 		hyp = (self.x_est**2 + self.y_est**2)**0.5
 		if (not self.theta_done and not self.linear_done) or self.theta_done and self.linear_done:
 			if self.theta_done:
-				T.linear.x = 0
-				T.linear.y = 0
-				T.linear.z = 0
-				T.angular.z = 0
+				self.T.linear.x = 0
+				self.T.linear.y = 0
+				self.T.linear.z = 0
+				self.T.angular.z = 0
 
 			elif self.to_2pi(self.theta_est) >= 180:
-				T.linear.x = 0
-				T.linear.y = 0
-				T.linear.z = 0
-				T.angular.z = -1*self.angular_spd
+				self.T.linear.x = 0
+				self.T.linear.y = 0
+				self.T.linear.z = 0
+				self.T.angular.z = self.angular_spd
 
 			elif self.to_2pi(self.theta_est) < 180:
-				T.linear.x = 0
-				T.linear.y = 0
-				T.linear.z = 0
-				T.angular.z = self.angular_spd
+				self.T.linear.x = 0
+				self.T.linear.y = 0
+				self.T.linear.z = 0
+				self.T.angular.z = -1*self.angular_spd
 
 		elif self.theta_done and not self.linear_done:
-			T.linear.x = self.linear_spd
-			T.linear.y = 0
-			T.linear.z = 0
-			T.angular.z = 0
-
+			self.T.linear.x = self.linear_spd
+			self.T.linear.y = 0
+			self.T.linear.z = 0
+			self.T.angular.z = 0
 		else:
 			pass
 
-		pub.publish(T)
+		pub.publish(self.T)
 
 	def sub_ctrl_msg(self, req):
 		self.x_est, self.y_est, self.theta_est, self.theta_done, self.linear_done = req.x, req.y, req.theta, req.theta_done, req.linear_done
@@ -83,11 +82,14 @@ class move_node(object):
 			return feedback_srvResponse(False)
 
 	def feedback_ctrl_msg(self):
-		rospy.init_node('scout_ctrl', anonymous=False)
-		fb_s = rospy.Service("feedback_srv", feedback_srv, self.sub_ctrl_msg)
+		# rospy.init_node('scout_ctrl', anonymous=False)
+		rospy.Service("feedback_srv", feedback_srv, self.sub_ctrl_msg)
 
 if __name__ == '__main__':
+	rospy.init_node('scout_ctrl', anonymous=False)
+	rate = rospy.Rate(15)
 	move_obj = move_node()
 	move_obj.feedback_ctrl_msg()
 	while not rospy.is_shutdown():
 		move_obj.scout_ctrl_command()
+		rate.sleep()

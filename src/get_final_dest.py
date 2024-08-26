@@ -90,7 +90,7 @@ class wpsService():
 			print("[INFO] wps Service did not process request: " + str(exc))
 
 if __name__ == '__main__':
-	rospy.init_node("current_final_pos", anonymous=False)
+	# rospy.init_node("current_final_pos", anonymous=False)
 	wps_response = wpsService()
 	wps_response.get_wps_from_srv()	
 
@@ -112,6 +112,8 @@ if __name__ == '__main__':
 	dests_obj.done_flag_server()
 	print("\n[INFO] Publishing destination information ...\n")
 	while not rospy.is_shutdown():
+		rospy.init_node("current_final_pos", anonymous=False)
+		rate = rospy.Rate(20)
 		dests_obj.publish_curr_final_pos()
 		# if dests_obj.idx < len(ls):
 		# 	# dests_obj.publish_dest_wp()
@@ -120,3 +122,4 @@ if __name__ == '__main__':
 		#if idx >= len(x):
 		#	print("\n[INFO] Final destination reached.")
 		#	break
+		rate.sleep()
