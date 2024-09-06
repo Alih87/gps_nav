@@ -64,10 +64,10 @@ class gps_pose_node(object):
 			trans = self.buf.lookup_transform('utm', 'base_link', rospy.Time())
 			self.X = trans.transform.translation.x
 			self.Y = trans.transform.translation.y
-			# rx = trans.transform.rotation.x
-			# ry = trans.transform.rotation.y
-			# rz = trans.transform.rotation.z
-			# rw = trans.transform.rotation.w
+			rx = trans.transform.rotation.x
+			ry = trans.transform.rotation.y
+			rz = trans.transform.rotation.z
+			rw = trans.transform.rotation.w
 			# self.HEADING = self.euler_from_quaternion(*[rx,ry,rz,rw])
 			# self.utm_pub_srv()
 		else:
@@ -75,8 +75,8 @@ class gps_pose_node(object):
 			# self.utm_pub_srv()
 
 	def lookup_rot(self):
-		if self.buf.can_transform('imu_link', 'base_link', rospy.Time(0), rospy.Duration(2)):
-			trans = self.buf.lookup_transform('imu_link', 'base_link', rospy.Time())
+		if self.buf.can_transform('imu_link', 'map', rospy.Time(0), rospy.Duration(2)):
+			trans = self.buf.lookup_transform('imu_link', 'map', rospy.Time())
 			# self.X = trans.transform.translation.x
 			# self.Y = trans.transform.translation.y
 			rx = trans.transform.rotation.x
@@ -88,6 +88,18 @@ class gps_pose_node(object):
 		else:
 			rospy.logdebug("Can't Transform")
 			# self.utm_pub_srv()
+	
+	def subs_odom_map(self):
+		rospy.Subscriber('odometry/filtered_map', Odometry, self.get_map_heading)
+
+	def get_map_heading(self, data):
+		x = data.pose.pose.orientation.x
+		y = data.pose.pose.orientation.y
+		z = data.pose.pose.orientation.z
+		w = data.pose.pose.orientation.w
+		
+		self.HEADING = self.euler_from_quaternion(x,y,z,w)
+		# print(self.HEADING)
 
 	def get_utm(self, data):
 		self.lat, self.long = data.latitude, data.longitude
@@ -188,7 +200,8 @@ if __name__== '__main__':
 			# print("Current Position", gps_pose_obj.X, gps_pose_obj.Y, gps_pose_obj.HEADING)
 			# gps_pose_obj.gps_sub()
 			gps_pose_obj.lookup_trans()
-			gps_pose_obj.lookup_rot()
+			gps_pose_obj.subs_odom_map()
+			# gps_pose_obj.lookup_rot()
 			# gps_pose_obj.mag_sub()
 			# gps_pose_obj.utm_pub()
 			# Using Scout Odometer

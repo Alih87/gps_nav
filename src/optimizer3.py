@@ -86,8 +86,9 @@ class optimizer_node():
 			return final_pos_srvResponse(False)
 
 	def get_state(self, req):
-		self.curr_x, self.curr_y, self.curr_theta = req.x, req.y, req.theta
-		# self.curr_theta = (self.curr_theta + 360) % 360
+		self.curr_x, self.curr_y, self.curr_theta = req.x, req.y, -1*req.theta
+		# if self.curr_theta < -180:
+		# 	self.curr_theta += 360
 		# print(self.curr_x, self.curr_y, self.curr_theta)
 		rcv = True
 		if rcv:
@@ -129,18 +130,16 @@ class optimizer_node():
 		# 	tgt_theta =- 360
 		# if tgt_theta < -180:
 		# 	tgt_theta += 360
-		self.theta = tgt_theta - self.curr_theta - 90
-		if self.theta < 0:
-			self.theta += 360
-		# if abs(self.theta) > 180:
-		# 	self.theta = self.theta + 360
-		# elif self.theta < -180:
-		# 	self.theta = 360 + self.theta
-		# if self.theta > 359:
-		# 	self.theta = self.theta % 360
+		self.theta = self.curr_theta - tgt_theta + 180
+		if self.theta >= 180:
+			self.theta = self.theta - 360
+		elif self.theta < -180:
+			self.theta = self.theta + 360
 		# print(self.curr_theta, tgt_theta, self.theta)
-		print(self.x, self.y, self.theta)
-
+		# print(self.curr_x, self.curr_y)
+		print(self.x, self.y, self.theta, self.curr_theta)
+		print(self.curr_x, self.curr_y)
+		print(self.dest_x, self.dest_y)
 
 		'''
 		Checks whether the current angle is within the 3 degree (at max) arc.
