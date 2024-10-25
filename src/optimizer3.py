@@ -126,17 +126,11 @@ class optimizer_node():
 		self.x = self.dest_x - self.curr_x
 		self.y = self.dest_y - self.curr_y
 		tgt_theta = self.calculate_angle2(self.x, self.y)
-		# if tgt_theta > 180:
-		# 	tgt_theta =- 360
-		# if tgt_theta < -180:
-		# 	tgt_theta += 360
 		self.theta = self.curr_theta - tgt_theta + 180
 		if self.theta >= 180:
 			self.theta = self.theta - 360
 		elif self.theta < -180:
 			self.theta = self.theta + 360
-		# print(self.curr_theta, tgt_theta, self.theta)
-		# print(self.curr_x, self.curr_y)
 		print(self.x, self.y, self.theta, self.curr_theta)
 		print(self.curr_x, self.curr_y)
 		print(self.dest_x, self.dest_y)
@@ -191,7 +185,6 @@ if __name__ == '__main__':
 	optim_obj = optimizer_node(collect_data=False)
 	print("[INFO] Initialized Optimization Node.")
 	optim_obj.get_curr_pose()
-	# optim_obj.contLoggingServer()
 	while not rospy.is_shutdown():
 		optim_obj.utm_map_listener()
 		optim_obj.to_go()
@@ -201,4 +194,3 @@ if __name__ == '__main__':
 		elif run_once and optim_obj.collect_data:
 			optim_obj.LoggingSrvProxy()
 		rate.sleep()
-	
