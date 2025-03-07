@@ -131,9 +131,11 @@ class optimizer_node():
 			self.theta = self.theta - 360
 		elif self.theta < -180:
 			self.theta = self.theta + 360
-		print(self.x, self.y, self.theta, self.curr_theta)
-		print(self.curr_x, self.curr_y)
-		print(self.dest_x, self.dest_y)
+
+		# Uncomment these
+		# print(self.x, self.y, self.theta, self.curr_theta)
+		# print(self.curr_x, self.curr_y)
+		# print(self.dest_x, self.dest_y)
 
 		'''
 		Checks whether the current angle is within the 3 degree (at max) arc.

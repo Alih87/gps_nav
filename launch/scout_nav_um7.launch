@@ -46,10 +46,11 @@
     <node name="current_pos_pub" pkg="gps_nav" type="gps_pose_um7_2.py"/>
     <node name="data_logging" pkg="gps_nav" type="data_logger.py"/>
 
+    <node pkg="imu_model" type="imuBias" name="imuBias_exp"/>
+
     <!--	   UNCOMMENT TO CONTROL SCOUT USING KEYBOARD
     <node name="teleop_keybord" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen">
         <param name="repeat_rate" value="$(arg repeat_rate)" />
     </node>
     -->
-
 </launch>

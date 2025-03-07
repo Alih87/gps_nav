@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   urdf
   std_msgs
   message_generation
+  kalman_filter
 )
 
 ## System dependencies are found with CMake's conventions

@@ -13,6 +13,7 @@
         "/home/scout/catkin_ws_d455/src/realsense-ros/realsense2_camera/include/**",
         "/home/scout/catkin_ws/src/scout_ros/scout_base/include/**",
         "/home/scout/catkin_ws/src/ugv_sdk/include/**",
+        "/home/scout/catkin_ws/src/kalman_filter/include",
         "/home/scout/catkin_ws/src/vslam/include/**",
         "/usr/include/**"
       ],

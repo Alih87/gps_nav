@@ -10,7 +10,6 @@ class model_node():
         # self.model = GI_NN(input_size=input_size, output_channels=output_channels, seq_len=seq_len)
         # self.model = self.model.float()
         # self.model.train()
-        
 
     def single_training_iter(self):
         pass

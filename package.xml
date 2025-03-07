@@ -49,6 +49,7 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
+  <depend>kalman_filter</depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rosmsg</build_depend>
   <build_depend>rospy</build_depend>
@@ -61,7 +62,6 @@
   <exec_depend>rosmsg</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>urdf</exec_depend>
-
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
